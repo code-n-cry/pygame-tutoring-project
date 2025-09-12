@@ -13,6 +13,7 @@ end_position = None
 drawing = False
 running = True
 speed_x = 10
+speed_y = 10
 rect = pygame.Rect(10, 500, 100, 100)
 while running:
     for event in pygame.event.get():
@@ -28,6 +29,10 @@ while running:
             rect.x += speed_x
         if pressed_keys[pygame.K_a] and rect.x > 0:
             rect.x -= speed_x
+        if pressed_keys[pygame.K_w] and rect.y > 0:
+            rect.y -= speed_y
+        if pressed_keys[pygame.K_s] and rect.y + 100 < HEIGHT:
+            rect.y += speed_y
         screen.fill((0, 0, 0))
         pygame.draw.rect(screen, (107, 142, 35), rect)
         clock.tick(60)
