@@ -9,10 +9,11 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Наша первая игра')
 
+
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(10, 500, 100, 100)
+        self.rect = pygame.Rect(x, y, 100, 100)
         self.speed_x = random.randint(5,15)
         self.speed_y = random.randint(5,15)
 
@@ -35,15 +36,21 @@ class Player(pygame.sprite.Sprite):
 
 
 
-player = Player()
+player1 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
+player2 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
+player3 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
+
+group = pygame.sprite.Group()
+group.add(player1, player2, player3)
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-    player.update()
+    group.update()
     screen.fill((0, 0, 0))
-    pygame.draw.rect(screen, (255, 255, 255), player.rect)
+    for i in group.sprites():
+        pygame.draw.rect(screen, (255, 255, 255), i.rect)
     clock.tick(60)
     pygame.display.flip()
 
