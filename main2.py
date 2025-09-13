@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from pygame.examples.cursors import image
+
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
@@ -8,49 +10,55 @@ clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Наша первая игра')
+bg_image = pygame.image.load('background.png')
+bg_image = pygame.transform.scale(bg_image, (WIDTH, HEIGHT))
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 100, 100)
-        self.speed_x = random.randint(5,15)
-        self.speed_y = random.randint(5,15)
+        self.rect = pygame.Rect(x, y, 30, 60)
+        self.speed_x = 7
+        self.speed_y = 2
+        self.jumping = False
+        self.jump_timer = 12
 
     def update(self):
-        self.rect.x += self.speed_x
-        self.rect.y -= self.speed_y
-        if self.rect.x + 100 > WIDTH or self.rect.x < 0:
-            self.speed_x = -self.speed_x
-        if  self.rect.y < 0 or self.rect.y + 100 > HEIGHT:
-            self.speed_y = -self.speed_y
-        '''pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_d] and self.rect.x + 100 < WIDTH:
+        pressed_keys = pygame.key.get_pressed()
+        if pressed_keys[pygame.K_d] and self.rect.x + 30 < WIDTH:
             self.rect.x += self.speed_x
         if pressed_keys[pygame.K_a] and self.rect.x > 0:
             self.rect.x -= self.speed_x
-        if pressed_keys[pygame.K_w] and self.rect.y > 0:
-            self.rect.y -= self.speed_y
-        if pressed_keys[pygame.K_s] and self.rect.y + 100 < HEIGHT:
-            self.rect.y += self.speed_y'''
 
 
+    def jump(self):
+        if self.jumping:
+            if self.jump_timer >= -12:
+                neg = 1
+                if self.jump_timer < 0:
+                    neg = -1
+                self.rect.y -= (self.jump_timer ** 2) // 10 * neg
+                self.jump_timer -= 1
+            else:
+                self.jumping = False
+                self.jump_timer = 12
 
-player1 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
-player2 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
-player3 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
+    def draw(self, screen):
+        pygame.draw.rect(screen, (90, 168, 25), self.rect)
 
-group = pygame.sprite.Group()
-group.add(player1, player2, player3)
+
+player = Player(50, 448)
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-    group.update()
-    screen.fill((0, 0, 0))
-    for i in group.sprites():
-        pygame.draw.rect(screen, (255, 255, 255), i.rect)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                player.jumping = True
+    player.update()
+    player.jump()
+    screen.blit(bg_image, (0, 0))
+    player.draw(screen)
     clock.tick(60)
     pygame.display.flip()
-
