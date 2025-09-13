@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
             self.speed_x = -self.speed_x
         if  self.rect.y < 0 or self.rect.y + 100 > HEIGHT:
             self.speed_y = -self.speed_y
-        '''pressed_keys = pygame.key.get_pressed()
+        pressed_keys = pygame.key.get_pressed()
         if pressed_keys[pygame.K_d] and self.rect.x + 100 < WIDTH:
             self.rect.x += self.speed_x
         if pressed_keys[pygame.K_a] and self.rect.x > 0:
@@ -32,25 +32,29 @@ class Player(pygame.sprite.Sprite):
         if pressed_keys[pygame.K_w] and self.rect.y > 0:
             self.rect.y -= self.speed_y
         if pressed_keys[pygame.K_s] and self.rect.y + 100 < HEIGHT:
-            self.rect.y += self.speed_y'''
+            self.rect.y += self.speed_y
 
 
 
 player1 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
 player2 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
 player3 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
+player4 = Player(random.randrange(WIDTH - 100), random.randrange(HEIGHT - 100))
 
 group = pygame.sprite.Group()
 group.add(player1, player2, player3)
+
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
     group.update()
+    player4.update()
     screen.fill((0, 0, 0))
     for i in group.sprites():
         pygame.draw.rect(screen, (255, 255, 255), i.rect)
+    pygame.draw.rect(screen, (90, 168, 25), player4.rect)
     clock.tick(60)
     pygame.display.flip()
 
