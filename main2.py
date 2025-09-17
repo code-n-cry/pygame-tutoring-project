@@ -6,6 +6,11 @@ pygame.init()
 WIDTH, HEIGHT = 800, 600
 clock = pygame.time.Clock()
 
+font = pygame.font.SysFont('Arial', 50)
+
+SPAWN_EVENT = pygame.USEREVENT + 1
+kill_count = 0
+pygame.time.set_timer(SPAWN_EVENT, 3000)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Наша первая игра')
 bg_image = pygame.image.load('background.png')
@@ -45,6 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 7
         self.speed_y = 2
         self.jumping = False
+        self.alive = True
         self.jump_timer = 12
 
     def update(self):
@@ -67,36 +73,52 @@ class Player(pygame.sprite.Sprite):
                 self.jump_timer = 12
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (90, 168, 25), self.rect)
+        if self.alive is True:
+            pygame.draw.rect(screen, (90, 168, 25), self.rect)
 
 
 player = Player(50, 448)
 enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
-for i in range(10):
-    enemy = Enemy(x=650, y=450)
-    enemy_group.add(enemy)
+enemy_count = 5
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bullet = Bullet(player.rect.x, player.rect.y + 30)
-                bullet_group.add(bullet)
+                if player.alive is True:
+                    bullet = Bullet(player.rect.x, player.rect.y + 30)
+                    bullet_group.add(bullet)
             if event.key == pygame.K_w:
                 player.jumping = True
+        if event.type == SPAWN_EVENT:
+            for i in range(enemy_count):
+                enemy = Enemy(x=random.randint(680, 750), y=450)
+                enemy_group.add(enemy)
+            enemy_count += 3
     for i in bullet_group:
         i.update()
+        if i.rect.x > 800:
+            i.kill()
+        for x in enemy_group:
+            if pygame.sprite.collide_rect(x, i):
+                kill_count += 1
+                x.kill()
+                i.kill()
     for i in enemy_group:
         i.update()
         if pygame.sprite.collide_rect(i, player):
-            player.kill()
+            player.alive = False
         if i.rect.x < 0:
             i.kill()
     player.update()
     player.jump()
+    text = f'Вы убили {kill_count} врагов'
+    rendered = font.render(text, True, (255, 0, 0))
     screen.blit(bg_image, (0, 0))
+    screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
     for i in bullet_group:
         i.draw(screen)
     for i in enemy_group:
