@@ -82,13 +82,18 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
-            if event.type == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE:
                     bullet = Bullet(player.rect.x,player.rect.y + 30)
                     bullet_group.add(bullet)
             if event.key == pygame.K_w:
                 player.jumping = True
     for i in bullet_group:
         i.update() 
+        if i.rect.x > 800:
+            i.kill()
+        for x in enemy_group:
+            if pygame.sprite.collide_rect(x,i):
+                x.kill()
     for i in enemy_group:
         i.update()
         if pygame.sprite.collide_rect(i,player):
