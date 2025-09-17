@@ -25,7 +25,19 @@ class Enemy(pygame.sprite.Sprite):
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
         
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.rect = pygame.Rect(x,y,7,7)
+        self.speed_x = 12
         
+    def update(self):
+        self.rect.x += self.speed_x
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (30, 40, 56), self.rect)
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -60,7 +72,8 @@ class Player(pygame.sprite.Sprite):
 
 
 player = Player(50, 448)
-enemy_group=pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+bullet_group = pygame.sprite.Group() 
 for i in range(5):
     enemy = Enemy(x = 650,y = 450)
     enemy_group.add(enemy)
@@ -69,8 +82,13 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
+            if event.type == pygame.K_SPACE:
+                    bullet = Bullet(player.rect.x,player.rect.y + 30)
+                    bullet_group.add(bullet)
             if event.key == pygame.K_w:
                 player.jumping = True
+    for i in bullet_group:
+        i.update() 
     for i in enemy_group:
         i.update()
         if pygame.sprite.collide_rect(i,player):
@@ -80,8 +98,11 @@ while True:
     player.update()
     player.jump()
     screen.blit(bg_image, (0, 0))
+    for i in bullet_group:
+        i.draw(screen)
     for i in enemy_group:
         i.draw(screen)
     player.draw(screen)
     clock.tick(60)
     pygame.display.flip()
+    
