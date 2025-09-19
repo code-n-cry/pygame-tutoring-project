@@ -115,7 +115,7 @@ class Game:
         self.current_enemies = 3
         self.kill_count = 0
 
-    def update(self, event):
+    def update_events(self, event):
         if self.menu.in_menu is True:
             self.menu.update(event)
         else:
@@ -124,16 +124,19 @@ class Game:
                     if self.player.alive is True:
                         bullet = Bullet(self.player.rect.x, self.player.rect.y + 30)
                         self.bullet_group.add(bullet)
-                    if event.key == pygame.K_w:
-                        self.player.jumping = True
+                if event.key == pygame.K_w:
+                    self.player.jumping = True
             if event.type == SPAWN_EVENT:
                 for i in range(self.current_enemies):
                     enemy = Enemy(x=random.randint(680, 750), y=450)
                     self.enemy_group.add(enemy)
                 self.current_enemies += 3
+
+    def update(self):
+        if self.menu.in_menu is False:
             for i in self.bullet_group:
                 i.update()
-                if i.rect.x > 800:
+                if i.rect.x > WIDTH:
                     i.kill()
                 for x in self.enemy_group:
                     if pygame.sprite.collide_rect(x, i):
@@ -166,12 +169,12 @@ class Game:
 
 game = Game()
 
-
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-        game.update(event)
+        game.update_events(event)
+    game.update()
     game.draw(screen)
     clock.tick(60)
     pygame.display.flip()
