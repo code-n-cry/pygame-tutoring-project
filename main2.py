@@ -20,6 +20,7 @@ pressed = False
 
 start_btn = pygame.rect.Rect(300, 270, 230, 50)
 
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -85,11 +86,14 @@ enemy_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 enemy_count = 5
 btn_text = font.render('Начать игру', True, (255, 255, 255))
+btn_menu = font.render('меню', True, (255, 255, 255))
 while True:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             pygame.quit()
+        if in_menu is True and event.type == pygame.MOUSEBUTTONDOWN:
+            in_menu = False
         if in_menu is True and event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
             if  300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
@@ -139,11 +143,13 @@ while True:
         player.draw(screen)
     else:
         screen.fill((0, 0, 0))
+        screen.blit(btn_menu, (330, 150))
         if pressed is False:
             pygame.draw.rect(screen, (255, 0, 0), start_btn)
             screen.blit(btn_text, (300, 270))
         else:
             pygame.draw.rect(screen, (0, 0, 255), start_btn)
             screen.blit(btn_text, (300, 270))
+
     clock.tick(60)
     pygame.display.flip()
