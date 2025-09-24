@@ -5,6 +5,7 @@ pygame.init()
 
 WIDTH, HEIGHT = 1000, 800
 clock = pygame.time.Clock()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.init()
 SPAWN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_EVENT, 3000)
@@ -15,6 +16,7 @@ clock = pygame.time.Clock()
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
+wall_group = pygame.sprite.Group()
 
 class Wall:
     def __init__(self,x,y,w,h):
@@ -56,10 +58,19 @@ def jump(self):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 60,30)
+        self.rect = pygame.Rect(x, y, 30,60)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
+
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.rect = pygame.Rect(x, y, 200,50)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (100, 10, 65), self.rect)
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -74,6 +85,22 @@ class Bullet(pygame.sprite.Sprite):
     def draw(self, screen):
         pygame.draw.rect(screen, (30, 40, 56), self.rect)
 
+
+x_list = []
+y_list = []
+for i in range(5):
+    x = random.randint(1,800)
+    y = random.randint(1,750)
+    for g in x_list:
+        if abs(x-g) <= 70: 
+           x = random.randint(1,800) 
+    for o in y_list:
+        if abs(y-o) <= 40: 
+           y = random.randint(1,750) 
+    wall = Wall(x,y)
+    wall_group.add(wall)
+    
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -86,5 +113,21 @@ while True:
                 enemy_bullet = Bullet(enemy.rect.x, enemy.rect.y + 30)
                 enemy_bullet_group.add(enemy_bullet)
         if event.type == SPAWN_EVENT:
-                enemy = Enemy(x=random.randint(1,940), y=random.randint(1,770))
-                enemy_group.add(enemy)
+            for i in enemy_group:
+                i.kill()
+            enemy = Enemy(x=random.randint(1,970), y=random.randint(1,730))
+            enemy_group.add(enemy)
+    for i in enemy_group:
+        i.update()
+    for i in enemy_bullet_group:
+        i.update()
+    screen.fill((0, 0, 0))
+    for i in enemy_group:
+        i.draw(screen)
+    for i in enemy_bullet_group:
+        i.draw(screen)
+    for i in wall_group:
+        i.draw(screen)
+    clock.tick(60)
+    pygame.display.flip()
+                
