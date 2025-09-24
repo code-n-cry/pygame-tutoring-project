@@ -91,12 +91,20 @@ y_list = []
 for i in range(5):
     x = random.randint(1,800)
     y = random.randint(1,750)
-    for g in x_list:
-        if abs(x-g) <= 70:
-           x = random.randint(1,800)
-    for o in y_list:
-        if abs(y-o) <= 40:
-           y = random.randint(1,750)
+    if x_list and y_list:
+        x_checked = 0
+        y_checked = 0
+        while x_checked < len(x_list) and y_checked < len(y_list):
+            if abs(x_list[x_checked - 1] - x) > 70:
+                x_checked += 1
+            else:
+                x_checked = 0
+                x = random.randint(1,800)
+            if abs(y_list[y_checked - 1] - y) > 70:
+                y_checked += 1
+            else:
+                y_checked = 0
+                y = random.randint(1,750)
     wall = Wall(x,y)
     wall_group.add(wall)
 
