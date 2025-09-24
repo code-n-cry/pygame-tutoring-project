@@ -88,3 +88,4 @@ while True:
         if event.type == SPAWN_EVENT:
                 enemy = Enemy(x=random.randint(1,940), y=random.randint(1,770))
                 enemy_group.add(enemy)
+    pygame.display.flip()
