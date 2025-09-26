@@ -9,7 +9,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.init()
 SPAWN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_EVENT, 3000)
-TIME_EVENT =pygame.USEREVENT + 2
+TIME_EVENT = pygame.USEREVENT + 2
 pygame.time.set_timer(TIME_EVENT, 1500)
 clock = pygame.time.Clock()
 
@@ -17,11 +17,6 @@ enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
-
-class Wall:
-    def __init__(self,x,y,w,h):
-        super().__init__()
-        self.rect = pygame.Rect(x, y, w, h)
 
 
 class Player(pygame.sprite.Sprite):
@@ -58,7 +53,7 @@ def jump(self):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 60,30)
+        self.rect = pygame.Rect(x, y, 60, 30)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
@@ -67,7 +62,7 @@ class Enemy(pygame.sprite.Sprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 200,50)
+        self.rect = pygame.Rect(x, y, 200, 50)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (100, 10, 65), self.rect)
@@ -89,25 +84,21 @@ class Bullet(pygame.sprite.Sprite):
 x_list = []
 y_list = []
 for i in range(5):
-    x = random.randint(1,800)
-    y = random.randint(1,750)
-    if x_list and y_list:
-        x_checked = 0
-        y_checked = 0
-        while x_checked < len(x_list) and y_checked < len(y_list):
-            if abs(x_list[x_checked - 1] - x) > 70:
-                x_checked += 1
-            else:
-                x_checked = 0
-                x = random.randint(1,800)
-            if abs(y_list[y_checked - 1] - y) > 70:
-                y_checked += 1
-            else:
-                y_checked = 0
-                y = random.randint(1,750)
-    wall = Wall(x,y)
+    x = random.randint(1, 800)
+    y = random.randint(1, 750)
+    if not x_list and not y_list:
+        x_list.append(x)
+        y_list.append(y)
+    else:
+        for i in range(len(x_list)):
+            while x_list[i] - 70 <= x <= x_list[i] + 270:
+                x = random.randint(1, 800)
+            while y_list[i] - 70 <= y <= y_list[i] + 270:
+                y = random.randint(1, 750)
+        x_list.append(x)
+        y_list.append(y)
+    wall = Wall(x, y)
     wall_group.add(wall)
-
 
 while True:
     for event in pygame.event.get():
@@ -123,7 +114,7 @@ while True:
         if event.type == SPAWN_EVENT:
             for i in enemy_group:
                 i.kill()
-            enemy = Enemy(x=random.randint(1,970), y=random.randint(1,730))
+            enemy = Enemy(x=random.randint(1, 970), y=random.randint(1, 730))
             enemy_group.add(enemy)
     for i in enemy_group:
         i.update()
