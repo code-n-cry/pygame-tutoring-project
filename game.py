@@ -121,18 +121,47 @@ while True:
             y = random.randint(1, 740)
             for i in wall_group:
                 while i.rect.x - 50 <= x <= i.rect.x + 250:
+                    print(1)
                     x = random.randint(1, 970)
                 while i.rect.y - 60 <= y <= i.rect.y + 110:
                     y = random.randint(1, 740)
             enemy = Enemy(x,y)
             enemy_group.add(enemy)
+            for i in player_bullet_group:
+                if i.rect.x > WIDTH:
+                    i.kill()
+                for x in enemy_group:
+                    if pygame.sprite.collide_rect(x, i):
+                        x.kill()
+                        i.kill()
+            for i in enemy_group:
+                if pygame.sprite.collide_rect(i,player):
+                    player.alive = False
+                if i.rect.x < 0:
+                    i.kill()
     for i in enemy_group:
         i.update()
     player.update()
     for i in enemy_bullet_group:
         i.update()
+        for g in wall_group:
+            if pygame.sprite.collide_rect(i,g):
+                i.kill()
+        if i.rect.x > WIDTH:
+            i.kill()
+        if  pygame.sprite.collide_rect(player,i):
+                player.alive = False   
     for i in player_bullet_group:
         i.update()
+        for n in wall_group:
+            if pygame.sprite.collide_rect(i,n):
+                i.kill()
+        if i.rect.x > WIDTH:
+            i.kill()
+        for x in enemy_group:
+            if pygame.sprite.collide_rect(x, i):
+                x.kill()
+                i.kill()   
     screen.fill((0, 0, 0))
     for i in enemy_group:
         i.draw(screen)
