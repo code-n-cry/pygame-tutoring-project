@@ -67,14 +67,14 @@ class Wall(pygame.sprite.Sprite):
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, speed):
         super().__init__()
         self.rect = pygame.Rect(x, y, 7, 7)
-        self.speed_x = 12
+        self.speed_x = speed
 
     def update(self):
         self.rect.x += self.speed_x
-        if self.rect.x < 0 and self.rect.x > WIDTH:
+        if self.rect.x < 0 or self.rect.right > WIDTH:
             self.kill()
 
     def draw(self, screen):
@@ -107,23 +107,23 @@ while True:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bullet = Bullet(player.rect.x,player.rect.y + 30)
+                bullet = Bullet(player.rect.x,player.rect.y + 30, 12)
                 player_bullet_group.add(bullet)
         if event.type == TIME_EVENT:
             for i in enemy_group:
-                enemy_bullet = Bullet(enemy.rect.x, enemy.rect.y + 30)
-                enemy_bullet_group.add(enemy_bullet)
+                enemy_bullet_left = Bullet(enemy.rect.x, enemy.rect.y + 30, 12)
+                enemy_bullet_right = Bullet(enemy.rect.x, enemy.rect.y + 30, -12)
+                enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
         if event.type == SPAWN_EVENT:
             for i in enemy_group:
                 i.kill()
             x = random.randint(1, 970)
-            y = random.randint(1, 970)
-
+            y = random.randint(1, 740)
             for i in wall_group:
-                while i.rect.x - 5 <= x <= i.rect.x + 205:
+                while i.rect.x - 50 <= x <= i.rect.x + 250:
                     x = random.randint(1, 970)
-                while i.rect.y - 5 <= y <= i.rect.y + 100:
-                    y = random.randint(1, 970)
+                while i.rect.y - 60 <= y <= i.rect.y + 110:
+                    y = random.randint(1, 740)
             enemy = Enemy(x,y)
             enemy_group.add(enemy)
     for i in enemy_group:
