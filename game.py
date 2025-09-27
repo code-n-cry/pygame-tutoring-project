@@ -116,9 +116,15 @@ while True:
         if event.type == SPAWN_EVENT:
             for i in enemy_group:
                 i.kill()
-            enemy = Enemy(x=random.randint(1, 970), y=random.randint(1, 740))
+            x = random.randint(1, 970)
+            y = random.randint(1, 970)
+
             for i in wall_group:
-                if 
+                while i.rect.x - 5 <= x <= i.rect.x + 205:
+                    x = random.randint(1, 970)
+                while i.rect.y - 5 <= y <= i.rect.y + 100:
+                    y = random.randint(1, 970)
+            enemy = Enemy(x,y)
             enemy_group.add(enemy)
     for i in enemy_group:
         i.update()
