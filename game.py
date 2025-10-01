@@ -26,22 +26,23 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.rect = pygame.Rect(x, y, 30, 60)
         self.speed_x = 7
-        self.speed_y = 2
+        self.speed_y = 7
         self.jumping = False
         self.alive = True
         self.jump_timer = 12
 
     def update(self):
-        pressed_keys = pygame.key.get_pressed()
-        if pressed_keys[pygame.K_d] and self.rect.x + 30 < WIDTH:
-            self.rect.x += self.speed_x
-        if pressed_keys[pygame.K_a] and self.rect.x > 10:
-            self.rect.x -= self.speed_x
-        if pressed_keys[pygame.K_s] and self.rect.y + 60 < HEIGHT:
-            self.rect.y += self.speed_y 
-        if pressed_keys[pygame.K_w] and self.rect.y > 0:   
-            self.rect.y  -= self.speed_y
-            
+        if self.alive:
+            pressed_keys = pygame.key.get_pressed()
+            if pressed_keys[pygame.K_d] and self.rect.x + 30 < WIDTH:
+                self.rect.x += self.speed_x
+            if pressed_keys[pygame.K_a] and self.rect.x > 10:
+                self.rect.x -= self.speed_x
+            if pressed_keys[pygame.K_s] and self.rect.y + 60 < HEIGHT:
+                self.rect.y += self.speed_y
+            if pressed_keys[pygame.K_w] and self.rect.y > 0:
+                self.rect.y  -= self.speed_y
+
 
 
     def draw(self, screen):
@@ -109,8 +110,9 @@ while True:
             pygame.quit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bullet = Bullet(player.rect.x,player.rect.y + 30, 12)
-                player_bullet_group.add(bullet)
+                if player.alive:
+                    bullet = Bullet(player.rect.x,player.rect.y + 30, 12)
+                    player_bullet_group.add(bullet)
         if event.type == TIME_EVENT:
             for i in enemy_group:
                 enemy_bullet_left = Bullet(enemy.rect.x, enemy.rect.y + 30, 12)
@@ -123,28 +125,20 @@ while True:
             y = random.randint(1, 740)
             for i in wall_group:
                 while i.rect.x - 50 <= x <= i.rect.x + 250:
-                    print(1)
                     x = random.randint(1, 970)
                 while i.rect.y - 60 <= y <= i.rect.y + 110:
                     y = random.randint(1, 740)
             enemy = Enemy(x,y)
             enemy_group.add(enemy)
-            for i in player_bullet_group:
-                if i.rect.x > WIDTH:
-                    i.kill()
-                for x in enemy_group:
-                    if pygame.sprite.collide_rect(x, i):
-                        kill_count += 1
-                        x.kill()
-                        i.kill()
-            for i in enemy_group:
-                if pygame.sprite.collide_rect(i,player):
-                    player.alive = False
-                if i.rect.x < 0:
-                    i.kill()
+            if pygame.sprite.collide_rect(i,player):
+                player.alive = False
+            if i.rect.x < 0:
+                i.kill()
     for i in enemy_group:
         i.update()
     player.update()
+    text = f'Вы убили {kill_count} врагов'
+    rendered = font.render(text, True, (255, 0, 0))
     for i in enemy_bullet_group:
         i.update()
         for g in wall_group:
@@ -153,7 +147,7 @@ while True:
         if i.rect.x > WIDTH:
             i.kill()
         if  pygame.sprite.collide_rect(player,i):
-                player.alive = False   
+                player.alive = False
     for i in player_bullet_group:
         i.update()
         for n in wall_group:
@@ -163,12 +157,10 @@ while True:
             i.kill()
         for x in enemy_group:
             if pygame.sprite.collide_rect(x, i):
+                kill_count += 1
                 x.kill()
-                i.kill()   
+                i.kill()
     screen.fill((0, 0, 0))
-    text = f'Вы убили {kill_count} врагов'
-    rendered = font.render(text, True, (255, 0, 0))
-    '''screen.blit((0, 0))'''
     screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
     for i in enemy_group:
         i.draw(screen)
