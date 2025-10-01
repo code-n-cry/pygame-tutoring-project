@@ -13,6 +13,8 @@ TIME_EVENT = pygame.USEREVENT + 2
 pygame.time.set_timer(TIME_EVENT, 1500)
 clock = pygame.time.Clock()
 
+font = pygame.font.SysFont('Bitcount Grid Double Ink', 50)
+
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
@@ -80,7 +82,7 @@ class Bullet(pygame.sprite.Sprite):
     def draw(self, screen):
         pygame.draw.rect(screen, (30, 40, 56), self.rect)
 
-
+kill_count = 0
 x_list = []
 y_list = []
 for i in range(5):
@@ -132,6 +134,7 @@ while True:
                     i.kill()
                 for x in enemy_group:
                     if pygame.sprite.collide_rect(x, i):
+                        kill_count += 1
                         x.kill()
                         i.kill()
             for i in enemy_group:
@@ -163,6 +166,10 @@ while True:
                 x.kill()
                 i.kill()   
     screen.fill((0, 0, 0))
+    text = f'Вы убили {kill_count} врагов'
+    rendered = font.render(text, True, (255, 0, 0))
+    '''screen.blit((0, 0))'''
+    screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
     for i in enemy_group:
         i.draw(screen)
     for i in enemy_bullet_group:
