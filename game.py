@@ -52,10 +52,11 @@ class Menu:
     def __init__(self):
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
         self.btn_text = font.render('Начать игру', True, (255, 255, 255))
-        self.difficult_btn = pygame.rect.Rect(300, 270, 230, 50)
+        self.difficult_btn = pygame.rect.Rect(300, 370, 500, 50)
         self.difficult_btn_text = font.render('Выбрать уровень сложности', True, (255, 255, 255))
         self.menu_text = font.render('Меню', True, (255, 255, 255))
-        self.pressed = False
+        self.difficult_pressed = False
+        self.start_pressed = False
         self.in_menu = True
 
     def update(self, event):
@@ -66,23 +67,27 @@ class Menu:
         if event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
             if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
-                self.pressed = True
+                self.start_pressed = True
             else:
-                self.pressed = False
+                self.start_pressed = False
+            if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
+                self.difficult_pressed = True
+            else:
+                self.difficult_pressed = False
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
-        screen.blit(self.menu_text, (330, 150))
-        screen.blit(self.btn_text, (300, 270))
-        screen.blit(self.difficult_btn_text, (300, 240))
-        if self.pressed is False:
+        if self.start_pressed is False:
             pygame.draw.rect(screen, (255, 0, 0), self.start_btn)
         else:
             pygame.draw.rect(screen, (0, 0, 255), self.start_btn)
-        if self.pressed is False:
+        if self.difficult_pressed is False:
             pygame.draw.rect(screen, (255, 0, 0), self.difficult_btn)
         else:
             pygame.draw.rect(screen, (0, 0, 255), self.difficult_btn)
+        screen.blit(self.menu_text, (370, 170))
+        screen.blit(self.btn_text, (300, 270))
+        screen.blit(self.difficult_btn_text, (300, 370))
 
 
 class Enemy(pygame.sprite.Sprite):
