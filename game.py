@@ -52,6 +52,7 @@ class Menu:
     def __init__(self):
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
         self.btn_text = font.render('Начать игру', True, (255, 255, 255))
+        self.difficult_btn = pygame.rect.Rect(300, 270, 230, 50)
         self.difficult_btn_text = font.render('Выбрать уровень сложности', True, (255, 255, 255))
         self.menu_text = font.render('Меню', True, (255, 255, 255))
         self.pressed = False
@@ -72,11 +73,16 @@ class Menu:
     def draw(self, screen):
         screen.fill((0, 0, 0))
         screen.blit(self.menu_text, (330, 150))
+        screen.blit(self.btn_text, (300, 270))
+        screen.blit(self.difficult_btn_text, (300, 240))
         if self.pressed is False:
             pygame.draw.rect(screen, (255, 0, 0), self.start_btn)
         else:
             pygame.draw.rect(screen, (0, 0, 255), self.start_btn)
-        screen.blit(self.btn_text, (300, 270))
+        if self.pressed is False:
+            pygame.draw.rect(screen, (255, 0, 0), self.difficult_btn)
+        else:
+            pygame.draw.rect(screen, (0, 0, 255), self.difficult_btn)
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -206,7 +212,7 @@ while True:
         for i in player_bullet_group:
             i.draw(screen)
         for i in wall_group:
-            i.draw(screen)
+            i.draw(screen)  
         player.draw(screen)
     clock.tick(60)
     pygame.display.flip()
