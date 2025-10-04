@@ -19,7 +19,7 @@ enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
-
+difficult = "easy"
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -52,18 +52,38 @@ class Menu:
     def __init__(self):
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
         self.btn_text = font.render('Начать игру', True, (255, 255, 255))
+        self.easy_btn = pygame.rect.Rect(300, 170, 230, 50)
+        self.btn_easy_text = font.render('Легкий', True, (255, 255, 255))
+        self.normal_btn = pygame.rect.Rect(300, 270, 230, 50)
+        self.btn_normal_text = font.render('Нормальный', True, (255, 255, 255))
+        self.hard_btn = pygame.rect.Rect(300, 370, 230, 50)
+        self.btn_hard_text = font.render('Сложный', True, (255, 255, 255))
         self.difficult_btn = pygame.rect.Rect(300, 370, 500, 50)
         self.difficult_btn_text = font.render('Выбрать уровень сложности', True, (255, 255, 255))
         self.menu_text = font.render('Меню', True, (255, 255, 255))
         self.difficult_pressed = False
+        self.choice = False
         self.start_pressed = False
         self.in_menu = True
 
     def update(self, event):
+        global difficult
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
-            if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
-                self.in_menu = False
+            if self.choice == False:
+                if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
+                    self.in_menu = False
+                if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
+                    self.choice = True 
+            else:
+                if 300 <= pos[0] <= 500 and 170 <= pos[1] <= 320:
+                    difficult = "easy"
+                if 300 <= pos[0] <= 500 and 270 <= pos[1] <= 420:
+                    difficult = "normal"
+                if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 520:
+                    difficult = "hard"
+        print(difficult)
+
         if event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
             if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
@@ -77,17 +97,25 @@ class Menu:
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
-        if self.start_pressed is False:
-            pygame.draw.rect(screen, (255, 0, 0), self.start_btn)
+        if self.choice == False:
+            if self.start_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.start_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), self.start_btn)
+            if self.difficult_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.difficult_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), self.difficult_btn)
+            screen.blit(self.menu_text, (370, 170))
+            screen.blit(self.btn_text, (300, 270))
+            screen.blit(self.difficult_btn_text, (300, 370))
         else:
-            pygame.draw.rect(screen, (0, 0, 255), self.start_btn)
-        if self.difficult_pressed is False:
-            pygame.draw.rect(screen, (255, 0, 0), self.difficult_btn)
-        else:
-            pygame.draw.rect(screen, (0, 0, 255), self.difficult_btn)
-        screen.blit(self.menu_text, (370, 170))
-        screen.blit(self.btn_text, (300, 270))
-        screen.blit(self.difficult_btn_text, (300, 370))
+            pygame.draw.rect(screen, (255, 0, 0), self.easy_btn)
+            pygame.draw.rect(screen, (255, 0, 0), self.normal_btn)
+            pygame.draw.rect(screen, (255, 0, 0), self.hard_btn)
+            screen.blit(self.btn_easy_text, (370, 170))
+            screen.blit(self.btn_normal_text, (300, 270))
+            screen.blit(self.btn_hard_text, (300, 370))
 
 
 class Enemy(pygame.sprite.Sprite):
