@@ -21,7 +21,6 @@ enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 difficult = "easy"
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -123,7 +122,6 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.rect = pygame.Rect(x, y, 30, 60)
-
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
 
@@ -197,57 +195,56 @@ while True:
                     x = random.randint(1, 970)
                     y = random.randint(1, 740)
                     for i in wall_group:
-                        while i.rect.x - 250 <= x <= i.rect.x + 350:
+                        while i.rect.x -250 <= x <= i.rect.x + 350:
                             x = random.randint(1, 970)
                         while i.rect.y - 120 <= y <= i.rect.y + 120:
                             y = random.randint(1, 740)
-
-            enemy = Enemy(x, y)
-            enemy_group.add(enemy)
-            if pygame.sprite.collide_rect(i, player):
+                enemy = Enemy(x, y)
+                enemy_group.add(enemy)
+                if pygame.sprite.collide_rect(i, player):
+                    player.alive = False
+                if i.rect.x < 0:
+                    i.kill()
+    if not menu.in_menu:
+        for i in enemy_group:
+            i.update()
+        player.update()
+        text = f'Вы убили {kill_count} врагов'
+        rendered = font.render(text, True, (255, 0, 0))
+        for i in enemy_bullet_group:
+            i.update()
+            for g in wall_group:
+                if pygame.sprite.collide_rect(i, g):
+                    i.kill()
+            if i.rect.x > WIDTH:
+                i.kill()
+            if pygame.sprite.collide_rect(player, i):
                 player.alive = False
-            if i.rect.x < 0:
+        for i in player_bullet_group:
+            i.update()
+            for n in wall_group:
+                if pygame.sprite.collide_rect(i, n):
+                    i.kill()
+            if i.rect.x > WIDTH:
                 i.kill()
-if not menu.in_menu:
-    for i in enemy_group:
-        i.update()
-    player.update()
-    text = f'Вы убили {kill_count} врагов'
-    rendered = font.render(text, True, (255, 0, 0))
-    for i in enemy_bullet_group:
-        i.update()
-        for g in wall_group:
-            if pygame.sprite.collide_rect(i, g):
-                i.kill()
-        if i.rect.x > WIDTH:
-            i.kill()
-        if pygame.sprite.collide_rect(player, i):
-            player.alive = False
-    for i in player_bullet_group:
-        i.update()
-        for n in wall_group:
-            if pygame.sprite.collide_rect(i, n):
-                i.kill()
-        if i.rect.x > WIDTH:
-            i.kill()
-        for enemy in enemy_group:
-            if pygame.sprite.collide_rect(enemy, i):
-                kill_count += 1
-                enemy.kill()
-                i.kill()
-if menu.in_menu is True:
-    menu.draw(screen)
-else:
-    screen.fill((0, 0, 0))
-    screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-    for i in enemy_group:
-        i.draw(screen)
-    for i in enemy_bullet_group:
-        i.draw(screen)
-    for i in player_bullet_group:
-        i.draw(screen)
-    for i in wall_group:
-        i.draw(screen)
-    player.draw(screen)
-clock.tick(60)
-pygame.display.flip()
+            for enemy in enemy_group:
+                if pygame.sprite.collide_rect(enemy, i):
+                    kill_count += 1
+                    enemy.kill()
+                    i.kill()
+    if menu.in_menu is True:
+        menu.draw(screen)
+    else:
+        screen.fill((0, 0, 0))
+        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
+        for i in enemy_group:
+            i.draw(screen)
+        for i in enemy_bullet_group:
+            i.draw(screen)
+        for i in player_bullet_group:
+            i.draw(screen)
+        for i in wall_group:
+            i.draw(screen)
+        player.draw(screen)
+    clock.tick(60)
+    pygame.display.flip()
