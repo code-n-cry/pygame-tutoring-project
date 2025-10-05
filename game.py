@@ -82,7 +82,7 @@ class Menu:
                     difficult = "normal"
                 if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 520:
                     difficult = "hard"
-        print(difficult)
+                self.choice = False
 
         if event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
@@ -121,8 +121,8 @@ class Menu:
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        print(x,y)
         self.rect = pygame.Rect(x, y, 30, 60)
-
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
 
