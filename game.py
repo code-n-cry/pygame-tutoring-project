@@ -21,6 +21,7 @@ enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 difficult = "easy"
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -67,7 +68,7 @@ class Menu:
         self.in_menu = True
 
     def update(self, event):
-        global difficult,enemy_count
+        global difficult, enemy_count
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             if self.choice == False:
@@ -84,7 +85,7 @@ class Menu:
                         enemy_count = 2
                     if difficult == "hard":
                         wall_count = 9
-                        enemy_count = random.randint(3,4)
+                        enemy_count = random.randint(3, 4)
                     for i in range(wall_count):
                         x = random.randint(1, 800)
                         y = random.randint(50, 750)
@@ -150,6 +151,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.rect = pygame.Rect(x, y, 30, 60)
+
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
 
@@ -200,7 +202,6 @@ while True:
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
-                print(enemy_count)
                 for c in range(enemy_count):
                     x = random.randint(1, 970)
                     y = random.randint(1, 740)
@@ -208,7 +209,7 @@ while True:
                         while len(enemy_group) >= enemy_count:
                             i.kill()
                         for i in wall_group:
-                            while i.rect.x -250 <= x <= i.rect.x + 350:
+                            while i.rect.x - 250 <= x <= i.rect.x + 350:
                                 x = random.randint(1, 970)
                             while i.rect.y - 120 <= y <= i.rect.y + 120:
                                 y = random.randint(1, 740)
@@ -218,7 +219,6 @@ while True:
                         player.alive = False
                     if i.rect.x < 0:
                         i.kill()
-                print(len(enemy_group))
     if not menu.in_menu:
         for i in enemy_group:
             i.update()
