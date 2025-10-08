@@ -153,7 +153,13 @@ class Bullet(pygame.sprite.Sprite):
 kill_count = 0
 x_list = []
 y_list = []
-for i in range(5):
+wall_count = 5
+if difficult == 'normal':
+    wall_count = 7
+if difficult == 'hard':
+    wall_count = 9
+print(wall_count)
+for i in range(wall_count):
     x = random.randint(1, 800)
     y = random.randint(1, 750)
     if not x_list and not y_list:
