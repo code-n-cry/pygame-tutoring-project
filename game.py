@@ -20,6 +20,7 @@ player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 difficult = "easy"
+life = 3
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -28,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 7
         self.speed_y = 7
         self.jumping = False
+        self.player_life = 3
         self.alive = True
         self.jump_timer = 12
 
@@ -67,7 +69,7 @@ class Menu:
         self.in_menu = True
 
     def update(self, event):
-        global difficult,enemy_count
+        global difficult,enemy_count,player
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             if self.choice == False:
@@ -79,12 +81,15 @@ class Menu:
                     if difficult == "easy":
                         wall_count = 5
                         enemy_count = 1
+                        player.player_life = 3
                     if difficult == "normal":
                         wall_count = 7
                         enemy_count = 2
+                        player.player_life = 2
                     if difficult == "hard":
                         wall_count = 9
                         enemy_count = random.randint(3,4)
+                        player.player_life = 1
                     for i in range(wall_count):
                         x = random.randint(1, 800)
                         y = random.randint(50, 750)
@@ -218,7 +223,6 @@ while True:
                         player.alive = False
                     if i.rect.x < 0:
                         i.kill()
-                print(len(enemy_group))
     if not menu.in_menu:
         for i in enemy_group:
             i.update()
@@ -233,7 +237,10 @@ while True:
             if i.rect.x > WIDTH:
                 i.kill()
             if pygame.sprite.collide_rect(player, i):
-                player.alive = False
+                if player.player_life == 0:
+                    player.alive = False
+                else:
+                    player.player_life - 1
         for i in player_bullet_group:
             i.update()
             for n in wall_group:
