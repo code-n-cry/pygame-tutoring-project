@@ -10,7 +10,7 @@ pygame.init()
 SPAWN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_EVENT, 3000)
 TIME_EVENT = pygame.USEREVENT + 2
-pygame.time.set_timer(TIME_EVENT, 1800)
+pygame.time.set_timer(TIME_EVENT, 1500)
 clock = pygame.time.Clock()
 
 font = pygame.font.SysFont('Bitcount Grid Double Ink', 50)
@@ -20,7 +20,6 @@ player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 difficult = "easy"
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -68,12 +67,14 @@ class Menu:
         self.in_menu = True
 
     def update(self, event):
-        global difficult, enemy_count
+        global difficult,enemy_count
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             if self.choice == False:
                 if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
                     self.in_menu = False
+                    x_list = []
+                    y_list = []
                     wall_count = 0
                     if difficult == "easy":
                         wall_count = 5
@@ -83,23 +84,23 @@ class Menu:
                         enemy_count = 2
                     if difficult == "hard":
                         wall_count = 9
-                        enemy_count = random.randint(3, 4)
-                    for q in range(wall_count):
-                        placed = False
+                        enemy_count = random.randint(3,4)
+                    for i in range(wall_count):
                         x = random.randint(1, 800)
                         y = random.randint(50, 750)
-                        wall_rect = pygame.Rect(x, y, 200, 50)
-                        while not placed:
-                            overlap = False
-                            for i in wall_group:
-                                if wall_rect.colliderect(i):
-                                    overlap = True
-                                    break
-                            if not overlap:
-                                wall_group.add(wall)
-                                placed = True
-                            if len(wall_group) == wall_count:
-                                break
+                        if not x_list and not y_list:
+                            x_list.append(x)
+                            y_list.append(y)
+                        else:
+                            for i in range(len(x_list)):
+                                while x_list[i] - 70 <= x <= x_list[i] + 270:
+                                    x = random.randint(1, 800)
+                                while y_list[i] - 70 <= y <= y_list[i] + 270:
+                                    y = random.randint(1, 750)
+                            x_list.append(x)
+                            y_list.append(y)
+                        wall = Wall(x, y)
+                        wall_group.add(wall)
                 if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
                     self.choice = True
             else:
@@ -149,7 +150,6 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.rect = pygame.Rect(x, y, 30, 60)
-
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
 
@@ -179,25 +179,7 @@ class Bullet(pygame.sprite.Sprite):
 
 
 kill_count = 0
-x_list = []
-y_list = []
-for i in range(5):
-    x = random.randint(1, 800)
-    y = random.randint(1, 750)
-    if not x_list and not y_list:
-        x_list.append(x)
-        y_list.append(y)
-    else:
-        for i in range(len(x_list)):
-            while x_list[i] - 70 <= x <= x_list[i] + 270:
-                x = random.randint(1, 800)
-            while y_list[i] - 70 <= y <= y_list[i] + 270:
-                y = random.randint(1, 750)
-        x_list.append(x)
-        y_list.append(y)
-    wall = Wall(x, y)
-    wall_group.add(wall)
-
+enemy_count = 1
 player = Player(50, 250)
 menu = Menu()
 while True:
@@ -212,7 +194,13 @@ while True:
                     if player.alive:
                         bullet = Bullet(player.rect.x, player.rect.y + 30, 12)
                         player_bullet_group.add(bullet)
+            if event.type == TIME_EVENT:
+                for i in enemy_group:
+                    enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
+                    enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
+                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
+                print(enemy_count)
                 for c in range(enemy_count):
                     x = random.randint(1, 970)
                     y = random.randint(1, 740)
@@ -220,7 +208,7 @@ while True:
                         while len(enemy_group) >= enemy_count:
                             i.kill()
                         for i in wall_group:
-                            while i.rect.x - 250 <= x <= i.rect.x + 350:
+                            while i.rect.x -250 <= x <= i.rect.x + 350:
                                 x = random.randint(1, 970)
                             while i.rect.y - 120 <= y <= i.rect.y + 120:
                                 y = random.randint(1, 740)
@@ -230,11 +218,7 @@ while True:
                         player.alive = False
                     if i.rect.x < 0:
                         i.kill()
-            if event.type == TIME_EVENT:
-                for i in enemy_group:
-                    enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
-                    enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
+                print(len(enemy_group))
     if not menu.in_menu:
         for i in enemy_group:
             i.update()
@@ -246,6 +230,8 @@ while True:
             for g in wall_group:
                 if pygame.sprite.collide_rect(i, g):
                     i.kill()
+            if i.rect.x > WIDTH:
+                i.kill()
             if pygame.sprite.collide_rect(player, i):
                 player.alive = False
         for i in player_bullet_group:
