@@ -1,6 +1,8 @@
 import pygame
 import random
 
+from lxml.xsltext import self_node
+
 pygame.init()
 
 WIDTH, HEIGHT = 1000, 800
@@ -20,6 +22,7 @@ player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 difficult = "easy"
+life = 3
 
 
 class Player(pygame.sprite.Sprite):
@@ -29,6 +32,7 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 7
         self.speed_y = 7
         self.jumping = False
+        self.player_life = 3
         self.alive = True
         self.jump_timer = 12
 
@@ -68,7 +72,7 @@ class Menu:
         self.in_menu = True
 
     def update(self, event):
-        global difficult, enemy_count
+        global difficult, enemy_count, player
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             if self.choice == False:
@@ -80,12 +84,15 @@ class Menu:
                     if difficult == "easy":
                         wall_count = 5
                         enemy_count = 1
+                        player.player_life = 3
                     if difficult == "normal":
                         wall_count = 7
                         enemy_count = 2
+                        player.player_life = 2
                     if difficult == "hard":
                         wall_count = 9
                         enemy_count = random.randint(3, 4)
+                        player.player_life = 1
                     for i in range(wall_count):
                         x = random.randint(1, 800)
                         y = random.randint(50, 750)
@@ -168,16 +175,31 @@ class Wall(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, speed):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 7, 7)
+        self.image = pygame.image.load("bullet.png")
+        self.image = pygame.transform.scale(self.image, (7, 7))
+        self.explosion_1 = pygame.image.load("explosion/1.jpg")
+        self.explosion_1 = pygame.transform.scale(self.explosion_1, (15, 15))
+        self.explosion_2 = pygame.image.load("explosion/2.jpg")
+        self.explosion_2 = pygame.transform.scale(self.explosion_2, (15, 15))
+        self.explosion_3 = pygame.image.load("explosion/3.jpg")
+        self.explosion_3 = pygame.transform.scale(self.explosion_3, (15, 15))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.speed_x = speed
+        self.current_frame = 0
+        self.explosion_images = [self.explosion_1, self.explosion_2, self.explosion_3]
 
     def update(self):
+        explosion = False
         self.rect.x += self.speed_x
         if self.rect.x < 0 or self.rect.right > WIDTH:
             self.kill()
+        if explosion:
 
     def draw(self, screen):
         pygame.draw.rect(screen, (30, 40, 56), self.rect)
+        screen.blit(self.image, self.rect)
 
 
 kill_count = 0
@@ -202,6 +224,7 @@ while True:
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
+                print(enemy_count)
                 for c in range(enemy_count):
                     x = random.randint(1, 970)
                     y = random.randint(1, 740)
@@ -233,7 +256,11 @@ while True:
             if i.rect.x > WIDTH:
                 i.kill()
             if pygame.sprite.collide_rect(player, i):
-                player.alive = False
+                i.kill()
+                if player.player_life == 0:
+                    player.alive = False
+                else:
+                    player.player_life -= 1
         for i in player_bullet_group:
             i.update()
             for n in wall_group:
