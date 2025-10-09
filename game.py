@@ -162,7 +162,7 @@ class Menu:
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 30, 60)
+        self.rect.x = x
 
     def draw(self, screen):
         pygame.draw.rect(screen, (200, 20, 5), self.rect)
@@ -211,7 +211,6 @@ class Bullet(pygame.sprite.Sprite):
                 self.kill()
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (30, 40, 56), self.rect)
         screen.blit(self.image, self.rect)
 
 
