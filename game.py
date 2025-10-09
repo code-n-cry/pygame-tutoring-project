@@ -1,7 +1,6 @@
 import pygame
 import random
 
-from lxml.xsltext import self_node
 
 pygame.init()
 
@@ -196,6 +195,7 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.x < 0 or self.rect.right > WIDTH:
             self.kill()
         if explosion:
+            pass
 
     def draw(self, screen):
         pygame.draw.rect(screen, (30, 40, 56), self.rect)
