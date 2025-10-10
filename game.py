@@ -86,39 +86,37 @@ class Menu:
         global difficult, enemy_count, player
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
-            if self.choice == False:
+            if not self.choice:
                 if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
                     self.in_menu = False
-                    x_list = []
-                    y_list = []
+                    coords = []
                     wall_count = 0
                     if difficult == "easy":
-                        wall_count = 5
+                        wall_count = 2
                         enemy_count = 1
                         player.player_life = 3
                     if difficult == "normal":
-                        wall_count = 7
+                        wall_count = 4
                         enemy_count = 2
                         player.player_life = 2
                     if difficult == "hard":
-                        wall_count = 9
+                        wall_count = 5
                         enemy_count = random.randint(3, 4)
                         player.player_life = 1
                     for i in range(wall_count):
                         x = random.randint(100, 800)
                         y = random.randint(100, 750)
-                        if not x_list and not y_list:
-                            x_list.append(x)
-                            y_list.append(y)
-                        else:
-                            for i in range(len(x_list)):
-                                while x_list[i] - 70 <= x <= x_list[i] + 270:
-                                    x = random.randint(1, 800)
-                                while y_list[i] - 70 <= y <= y_list[i] + 270:
-                                    y = random.randint(1, 750)
-                            x_list.append(x)
-                            y_list.append(y)
+                        overlap = True
                         wall = Wall(x, y)
+                        while overlap:
+                            overlap = False
+                            for i in wall_group:
+                                x = random.randint(100, 800)
+                                y = random.randint(100, 750)
+                                wall = Wall(x, y)
+                                if pygame.sprite.collide_rect(wall, i):
+                                    overlap = True
+                            coords.append([x, y])
                         wall_group.add(wall)
                 if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
                     self.choice = True
@@ -204,7 +202,7 @@ class Enemy(pygame.sprite.Sprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 200, 50)
+        self.rect = pygame.Rect(x, y, 100, 35)
 
     def draw(self, screen):
         pygame.draw.rect(screen, (100, 10, 65), self.rect)
@@ -234,7 +232,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.speed_x
-        if self.rect.x < 30 or self.rect.right > WIDTH - 50:
+        if self.rect.x < 0 or self.rect.right > WIDTH - 50:
             self.explosion = True
         if self.explosion:
             self.speed_x = 0
@@ -271,18 +269,22 @@ while True:
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
+                for i in enemy_group:
+                    while len(enemy_group) >= enemy_count:
+                        i.kill()
                 for c in range(enemy_count):
-                    x = random.randint(51, 970)
-                    y = random.randint(51, 740)
-                    for i in enemy_group:
-                        while len(enemy_group) >= enemy_count:
-                            i.kill()
-                        for i in wall_group:
-                            while i.rect.x - 250 <= x <= i.rect.x + 350:
-                                x = random.randint(1, 970)
-                            while i.rect.y - 120 <= y <= i.rect.y + 120:
-                                y = random.randint(1, 740)
+                    x = random.randint(51, 940)
+                    y = random.randint(51, 720)
                     enemy = Enemy(x, y)
+                    overlap = True
+                    while overlap is True:
+                        for j in wall_group:
+                            overlap = False
+                            x = random.randint(51, 940)
+                            y = random.randint(51, 720)
+                            enemy = Enemy(x, y)
+                            if pygame.sprite.collide_rect(i, enemy) or pygame.sprite.collide_rect(j, enemy):
+                                overlap = True
                     enemy_group.add(enemy)
                     if pygame.sprite.collide_rect(i, player):
                         player.alive = False
