@@ -19,23 +19,26 @@ enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
+heart_image = pygame.image.load('images/heart.png')
+heart_image = pygame.transform.scale(heart_image, (30, 30))
 difficult = "easy"
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self):
         super().__init__()
-        self.rect = pygame.Rect(x, y, 30, 60)
         self.speed_x = 7
         self.speed_y = 7
         self.jumping = False
         self.player_life = 3
         self.alive = True
         self.jump_timer = 12
+        self.image = pygame.image.load("images/player.png")
+        self.image = pygame.transform.scale(self.image, (30, 60))
+        self.rect = self.image.get_rect()
 
     def update(self):
         global wall_group
-        overlap = False
         old_x = self.rect.x
         old_y = self.rect.y
         if self.alive:
@@ -55,7 +58,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, screen):
         if self.alive is True:
-            pygame.draw.rect(screen, (90, 168, 25), self.rect)
+            screen.blit(self.image, self.rect)
 
 
 class Menu:
@@ -71,7 +74,10 @@ class Menu:
         self.difficult_btn = pygame.rect.Rect(300, 370, 500, 50)
         self.difficult_btn_text = font.render('Выбрать уровень сложности', True, (255, 255, 255))
         self.menu_text = font.render('Меню', True, (255, 255, 255))
+        self.easy_pressed = False
+        self.normal_pressed = False
         self.difficult_pressed = False
+        self.hard_pressed = False
         self.choice = False
         self.start_pressed = False
         self.in_menu = True
@@ -99,8 +105,8 @@ class Menu:
                         enemy_count = random.randint(3, 4)
                         player.player_life = 1
                     for i in range(wall_count):
-                        x = random.randint(50, 800)
-                        y = random.randint(50, 750)
+                        x = random.randint(100, 800)
+                        y = random.randint(100, 750)
                         if not x_list and not y_list:
                             x_list.append(x)
                             y_list.append(y)
@@ -117,24 +123,38 @@ class Menu:
                 if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
                     self.choice = True
             else:
-                if 300 <= pos[0] <= 500 and 170 <= pos[1] <= 320:
+                if 300 <= pos[0] <= 500 and 170 <= pos[1] <= 220:
                     difficult = "easy"
-                if 300 <= pos[0] <= 500 and 270 <= pos[1] <= 420:
+                if 300 <= pos[0] <= 500 and 270 <= pos[1] <= 320:
                     difficult = "normal"
-                if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 520:
+                if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 420:
                     difficult = "hard"
                 self.choice = False
 
         if event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
-            if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
-                self.start_pressed = True
+            if not self.choice:
+                if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
+                    self.start_pressed = True
+                else:
+                    self.start_pressed = False
+                if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
+                    self.difficult_pressed = True
+                else:
+                    self.difficult_pressed = False
             else:
-                self.start_pressed = False
-            if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
-                self.difficult_pressed = True
-            else:
-                self.difficult_pressed = False
+                if 300 <= pos[0] <= 500 and 170 <= pos[1] <= 220:
+                    self.easy_pressed = True
+                else:
+                    self.easy_pressed = False
+                if 300 <= pos[0] <= 500 and 270 <= pos[1] <= 320:
+                    self.normal_pressed = True
+                else:
+                    self.normal_pressed = False
+                if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 420:
+                    self.hard_pressed = True
+                else:
+                    self.hard_pressed = False
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
@@ -151,9 +171,18 @@ class Menu:
             screen.blit(self.btn_text, (300, 270))
             screen.blit(self.difficult_btn_text, (300, 370))
         else:
-            pygame.draw.rect(screen, (255, 0, 0), self.easy_btn)
-            pygame.draw.rect(screen, (255, 0, 0), self.normal_btn)
-            pygame.draw.rect(screen, (255, 0, 0), self.hard_btn)
+            if self.easy_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.easy_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), self.easy_btn)
+            if self.normal_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.normal_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), self.normal_btn)
+            if self.hard_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.hard_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), self.hard_btn)
             screen.blit(self.btn_easy_text, (370, 170))
             screen.blit(self.btn_normal_text, (300, 270))
             screen.blit(self.btn_hard_text, (300, 370))
@@ -162,10 +191,14 @@ class Menu:
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        self.image = pygame.image.load("images/enemy.png")
+        self.image = pygame.transform.scale(self.image, (30, 60))
+        self.rect = self.image.get_rect()
         self.rect.x = x
+        self.rect.y = y
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (200, 20, 5), self.rect)
+        screen.blit(self.image, self.rect)
 
 
 class Wall(pygame.sprite.Sprite):
@@ -180,13 +213,13 @@ class Wall(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, speed):
         super().__init__()
-        self.image = pygame.image.load("bullet.png")
+        self.image = pygame.image.load("images/bullet.png")
         self.image = pygame.transform.scale(self.image, (7, 7))
-        self.explosion_1 = pygame.image.load("explosion/1.png")
+        self.explosion_1 = pygame.image.load("images/explosion/1.png")
         self.explosion_1 = pygame.transform.scale(self.explosion_1, (50, 50))
-        self.explosion_2 = pygame.image.load("explosion/2.png")
+        self.explosion_2 = pygame.image.load("images/explosion/2.png")
         self.explosion_2 = pygame.transform.scale(self.explosion_2, (50, 50))
-        self.explosion_3 = pygame.image.load("explosion/3.png")
+        self.explosion_3 = pygame.image.load("images/explosion/3.png")
         self.explosion_3 = pygame.transform.scale(self.explosion_3, (50, 50))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -196,6 +229,7 @@ class Bullet(pygame.sprite.Sprite):
                                  self.explosion_2, self.explosion_2, self.explosion_3,
                                  self.explosion_3, self.explosion_3]
         self.current_explosion = 0
+        self.harmful = True
         self.explosion = False
 
     def update(self):
@@ -211,12 +245,13 @@ class Bullet(pygame.sprite.Sprite):
                 self.kill()
 
     def draw(self, screen):
+        pygame.draw.rect(screen, (30, 40, 56), self.rect)
         screen.blit(self.image, self.rect)
 
 
 kill_count = 0
 enemy_count = 1
-player = Player(50, 250)
+player = Player()
 menu = Menu()
 while True:
     for event in pygame.event.get():
@@ -264,9 +299,11 @@ while True:
             for g in wall_group:
                 if pygame.sprite.collide_rect(i, g):
                     i.explosion = True
-            if pygame.sprite.collide_rect(player, i):
+            if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
-                if player.player_life <= 0:
+                i.harmful = False
+                if player.player_life <= 1:
+                    player.player_life -= 1
                     player.alive = False
                 else:
                     player.player_life -= 1
@@ -276,7 +313,7 @@ while True:
                 if pygame.sprite.collide_rect(i, n):
                     i.explosion = True
             for enemy in enemy_group:
-                if pygame.sprite.collide_rect(enemy, i):
+                if pygame.sprite.collide_rect(enemy, i) and i.harmful:
                     kill_count += 1
                     enemy.kill()
                     i.explosion = True
@@ -284,6 +321,8 @@ while True:
         menu.draw(screen)
     else:
         screen.fill((0, 0, 0))
+        for i in range(player.player_life):
+            screen.blit(heart_image, (i * 50, 0))
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
         for i in enemy_group:
             i.draw(screen)
