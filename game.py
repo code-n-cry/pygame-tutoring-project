@@ -14,6 +14,7 @@ pygame.time.set_timer(TIME_EVENT, 1500)
 clock = pygame.time.Clock()
 
 font = pygame.font.SysFont('Bitcount Grid Double Ink', 50)
+font_big = pygame.font.SysFont('Bitcount Grid Double Ink', 150)
 
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
@@ -279,8 +280,8 @@ while True:
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
-                for i in enemy_group:
-                    while len(enemy_group) >= enemy_count:
+                while len(enemy_group) >= enemy_count:
+                    for i in enemy_group:
                         i.kill()
                 for c in range(enemy_count):
                     x = random.randint(51, 940)
@@ -306,7 +307,7 @@ while True:
         player.update()
         text = f'Вы убили {kill_count} врагов'
         rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font.render(text_player, True, (255, 0, 0))     
+        rendered_2 = font_big.render(text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -336,9 +337,6 @@ while True:
         screen.fill((0, 0, 0))
         for i in range(player.player_life):
             screen.blit(heart_image, (i * 50, 0))
-        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if player.alive == False:
-            screen.blit(rendered_2, (500,400))
         for i in enemy_group:
             i.draw(screen)
         for i in enemy_bullet_group:
@@ -348,5 +346,8 @@ while True:
         for i in wall_group:
             i.draw(screen)
         player.draw(screen)
+        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
+        if player.alive == False:
+            screen.blit(rendered_2, (250,400))
     clock.tick(60)
     pygame.display.flip()
