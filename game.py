@@ -262,6 +262,9 @@ enemy_count = 1
 player = Player()
 menu = Menu()
 text_player = 'вы погибли' 
+btn_die_text = font.render('Перейти меню', True, (255, 255, 255))
+die_btn = pygame.rect.Rect(300, 370, 500, 50)
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -300,7 +303,7 @@ while True:
                     if pygame.sprite.collide_rect(i, player):
                         player.alive = False
                     if i.rect.x < 0:
-                        i.kill()
+                        i.kill()   
     if not menu.in_menu:
         for i in enemy_group:
             i.update()
@@ -348,6 +351,7 @@ while True:
         player.draw(screen)
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
         if player.alive == False:
+            menu.in_menu = True
             screen.blit(rendered_2, (250,400))
     clock.tick(60)
     pygame.display.flip()
