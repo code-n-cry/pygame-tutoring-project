@@ -253,6 +253,7 @@ kill_count = 0
 enemy_count = 1
 player = Player()
 menu = Menu()
+text_player = 'вы погибли' 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -298,6 +299,7 @@ while True:
         player.update()
         text = f'Вы убили {kill_count} врагов'
         rendered = font.render(text, True, (255, 0, 0))
+        rendered_2 = font.render(text_player, True, (255, 0, 0))     
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -328,6 +330,8 @@ while True:
         for i in range(player.player_life):
             screen.blit(heart_image, (i * 50, 0))
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
+        if player.alive == False:
+            screen.blit(rendered_2, (500,400))
         for i in enemy_group:
             i.draw(screen)
         for i in enemy_bullet_group:
