@@ -44,9 +44,11 @@ class Player(pygame.sprite.Sprite):
         if self.alive:
             pressed_keys = pygame.key.get_pressed()
             if pressed_keys[pygame.K_d] and self.rect.x + 30 < WIDTH:
+                self.speed_x = 7
                 self.rect.x += self.speed_x
             if pressed_keys[pygame.K_a] and self.rect.x > 10:
-                self.rect.x -= self.speed_x
+                self.speed_x = -7
+                self.rect.x += self.speed_x
             if pressed_keys[pygame.K_s] and self.rect.y + 60 < HEIGHT:
                 self.rect.y += self.speed_y
             if pressed_keys[pygame.K_w] and self.rect.y > 0:
@@ -261,7 +263,7 @@ while True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if player.alive:
-                        bullet = Bullet(player.rect.x, player.rect.y + 30, 12)
+                        bullet = Bullet(player.rect.x, player.rect.y + 30, 12 * (player.speed_x / abs( player.speed_x)))
                         player_bullet_group.add(bullet)
             if event.type == TIME_EVENT:
                 for i in enemy_group:
