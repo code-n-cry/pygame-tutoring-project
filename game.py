@@ -33,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.player_life = 3
         self.alive = True
         self.jump_timer = 12
+        self.right = True
         self.image = pygame.image.load("images/player.png")
         self.image = pygame.transform.scale(self.image, (30, 60))
         self.rect = self.image.get_rect()
@@ -46,9 +47,15 @@ class Player(pygame.sprite.Sprite):
             if pressed_keys[pygame.K_d] and self.rect.x + 30 < WIDTH:
                 self.speed_x = 7
                 self.rect.x += self.speed_x
+                if not self.right:
+                    self.right = True
+                    self.image = pygame.transform.flip(self.image, True, False)
             if pressed_keys[pygame.K_a] and self.rect.x > 10:
                 self.speed_x = -7
                 self.rect.x += self.speed_x
+                if self.right:
+                    self.right = False
+                    self.image = pygame.transform.flip(self.image, True, False)
             if pressed_keys[pygame.K_s] and self.rect.y + 60 < HEIGHT:
                 self.rect.y += self.speed_y
             if pressed_keys[pygame.K_w] and self.rect.y > 0:
