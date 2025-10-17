@@ -374,18 +374,12 @@ while True:
             i.draw(screen)
         player.draw(screen)
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-<<<<<<< HEAD
         if player.alive is False:
-            menu.in_menu = True
-            screen.blit(rendered_2, (250, 400))
-=======
-        if player.alive == False:
             if die_pressed is False:
                 pygame.draw.rect(screen, (255, 0, 0), die_btn)
             else:
                 pygame.draw.rect(screen, (0, 0, 255), die_btn)
-            screen.blit(rendered_2, (250,400))
+            screen.blit(rendered_2, (250, 400))
 
->>>>>>> d576cfc279b02acf4695a8f1992b0cd3a1400e12
     clock.tick(60)
     pygame.display.flip()
