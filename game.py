@@ -264,6 +264,7 @@ menu = Menu()
 text_player = 'вы погибли' 
 btn_die_text = font.render('Перейти меню', True, (255, 255, 255))
 die_btn = pygame.rect.Rect(300, 370, 500, 50)
+die_pressed = False
 
 while True:
     for event in pygame.event.get():
@@ -277,6 +278,15 @@ while True:
                     if player.alive:
                         bullet = Bullet(player.rect.x, player.rect.y + 30, 12 * (player.speed_x / abs( player.speed_x)))
                         player_bullet_group.add(bullet)
+            if player.alive == False and  event.type == pygame.MOUSEMOTION:
+                pos = pygame.mouse.get_pos()
+                if 300 <= pos[0] <= 370 and 500 <= pos[1] <= 550 :
+                    die_pressed = True
+                else:
+                    die_pressed = False
+            if event.type == pygame.MOUSEBUTTONDOWN and player.alive == False and die_pressed == True:
+                    menu.in_menu = True
+
             if event.type == TIME_EVENT:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
@@ -351,7 +361,11 @@ while True:
         player.draw(screen)
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
         if player.alive == False:
-            menu.in_menu = True
+            if die_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), die_btn)
+            else:
+                pygame.draw.rect(screen, (0, 0, 255), die_btn)
             screen.blit(rendered_2, (250,400))
+
     clock.tick(60)
     pygame.display.flip()
