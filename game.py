@@ -13,14 +13,14 @@ TIME_EVENT = pygame.USEREVENT + 2
 pygame.time.set_timer(TIME_EVENT, 1500)
 clock = pygame.time.Clock()
 
-font = pygame.font.SysFont('Bitcount Grid Double Ink', 50)
-font_big = pygame.font.SysFont('Bitcount Grid Double Ink', 150)
+font = pygame.font.SysFont("Bitcount Grid Double Ink", 50)
+font_big = pygame.font.SysFont("Bitcount Grid Double Ink", 150)
 
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
-heart_image = pygame.image.load('images/heart.png')
+heart_image = pygame.image.load("images/heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
 difficult = "easy"
 
@@ -74,16 +74,18 @@ class Player(pygame.sprite.Sprite):
 class Menu:
     def __init__(self):
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
-        self.btn_text = font.render('Начать игру', True, (255, 255, 255))
+        self.btn_text = font.render("Начать игру", True, (255, 255, 255))
         self.easy_btn = pygame.rect.Rect(300, 170, 230, 50)
-        self.btn_easy_text = font.render('Легкий', True, (255, 255, 255))
+        self.btn_easy_text = font.render("Легкий", True, (255, 255, 255))
         self.normal_btn = pygame.rect.Rect(300, 270, 230, 50)
-        self.btn_normal_text = font.render('Нормальный', True, (255, 255, 255))
+        self.btn_normal_text = font.render("Нормальный", True, (255, 255, 255))
         self.hard_btn = pygame.rect.Rect(300, 370, 230, 50)
-        self.btn_hard_text = font.render('Сложный', True, (255, 255, 255))
+        self.btn_hard_text = font.render("Сложный", True, (255, 255, 255))
         self.difficult_btn = pygame.rect.Rect(300, 370, 500, 50)
-        self.difficult_btn_text = font.render('Выбрать уровень сложности', True, (255, 255, 255))
-        self.menu_text = font.render('Меню', True, (255, 255, 255))
+        self.difficult_btn_text = font.render(
+            "Выбрать уровень сложности", True, (255, 255, 255)
+        )
+        self.menu_text = font.render("Меню", True, (255, 255, 255))
         self.easy_pressed = False
         self.normal_pressed = False
         self.difficult_pressed = False
@@ -166,7 +168,7 @@ class Menu:
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
-        if self.choice == False:
+        if self.choice is False:
             if self.start_pressed is False:
                 pygame.draw.rect(screen, (255, 0, 0), self.start_btn)
             else:
@@ -233,9 +235,14 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.speed_x = speed
-        self.explosion_images = [self.explosion_1,
-                                 self.explosion_2, self.explosion_2, self.explosion_3,
-                                 self.explosion_3, self.explosion_3]
+        self.explosion_images = [
+            self.explosion_1,
+            self.explosion_2,
+            self.explosion_2,
+            self.explosion_3,
+            self.explosion_3,
+            self.explosion_3,
+        ]
         self.current_explosion = 0
         self.harmful = True
         self.explosion = False
@@ -261,8 +268,8 @@ kill_count = 0
 enemy_count = 1
 player = Player()
 menu = Menu()
-text_player = 'вы погибли' 
-btn_die_text = font.render('Перейти меню', True, (255, 255, 255))
+text_player = "вы погибли"
+btn_die_text = font.render("Перейти меню", True, (255, 255, 255))
 die_btn = pygame.rect.Rect(300, 370, 500, 50)
 
 while True:
@@ -275,13 +282,18 @@ while True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if player.alive:
-                        bullet = Bullet(player.rect.x, player.rect.y + 30, 12 * (player.speed_x / abs( player.speed_x)))
+                        bullet = Bullet(
+                            player.rect.x,
+                            player.rect.y + 30,
+                            12 * (player.speed_x / abs(player.speed_x)),
+                        )
                         player_bullet_group.add(bullet)
             if event.type == TIME_EVENT:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
+                    enemy_bullet_group.add(
+                        enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
                 while len(enemy_group) >= enemy_count:
                     for i in enemy_group:
@@ -297,18 +309,20 @@ while True:
                             x = random.randint(51, 940)
                             y = random.randint(51, 720)
                             enemy = Enemy(x, y)
-                            if pygame.sprite.collide_rect(i, enemy) or pygame.sprite.collide_rect(j, enemy):
+                            if pygame.sprite.collide_rect(
+                                i, enemy
+                            ) or pygame.sprite.collide_rect(j, enemy):
                                 overlap = True
                     enemy_group.add(enemy)
                     if pygame.sprite.collide_rect(i, player):
                         player.alive = False
                     if i.rect.x < 0:
-                        i.kill()   
+                        i.kill()
     if not menu.in_menu:
         for i in enemy_group:
             i.update()
         player.update()
-        text = f'Вы убили {kill_count} врагов'
+        text = f"Вы убили {kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
         rendered_2 = font_big.render(text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
@@ -350,8 +364,8 @@ while True:
             i.draw(screen)
         player.draw(screen)
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if player.alive == False:
+        if player.alive is False:
             menu.in_menu = True
-            screen.blit(rendered_2, (250,400))
+            screen.blit(rendered_2, (250, 400))
     clock.tick(60)
     pygame.display.flip()
