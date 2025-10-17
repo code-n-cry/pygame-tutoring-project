@@ -272,6 +272,7 @@ text_player = "вы погибли"
 btn_die_text = font.render("Перейти меню", True, (255, 255, 255))
 die_btn = pygame.rect.Rect(300, 570, 500, 50)
 die_pressed = False
+enemy_die = False
 
 while True:
     for event in pygame.event.get():
@@ -297,7 +298,13 @@ while True:
                     die_pressed = False
             if event.type == pygame.MOUSEBUTTONDOWN and player.alive is False and die_pressed is True:
                 menu.in_menu = True
-
+                player.alive = True
+                for i in enemy_group:
+                    i.kill()
+                for i in wall_group:
+                    i.kill()
+                for i in enemy_bullet_group:
+                    i.kill()    
             if event.type == TIME_EVENT:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
