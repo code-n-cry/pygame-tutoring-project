@@ -7,7 +7,8 @@ con = sqlite3.connect('records.db')
 cursor = con.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS records(id PRIMARY KEY,record INTEGER)''')
 con.commit()
-con.close()pygame.mixer.init()
+con.close()
+pygame.mixer.init()
 
 WIDTH, HEIGHT = 1000, 800
 clock = pygame.time.Clock()
