@@ -42,6 +42,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_timer = 12
         self.right = True
         self.image = pygame.image.load("images/player.png")
+        self.sound = pygame.mixer.Sound("sounds/damage_enemy.mp3")
         self.image = pygame.transform.scale(self.image, (30, 60))
         self.rect = self.image.get_rect()
 
@@ -219,6 +220,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load("images/enemy.png")
+        self.sound = pygame.mixer.Sound("sounds/damage_enemy.mp3")
         self.image = pygame.transform.scale(self.image, (30, 60))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -383,6 +385,7 @@ while True:
                 if player.player_life <= 1:
                     player.player_life -= 1
                     player.alive = False
+                    player.sound.play()
                 else:
                     player.player_life -= 1
         for i in player_bullet_group:
@@ -393,6 +396,7 @@ while True:
             for enemy in enemy_group:
                 if pygame.sprite.collide_rect(enemy, i) and i.harmful:
                     kill_count += 1
+                    enemy.sound.play()
                     enemy.kill()
                     i.explosion = True
     if menu.in_menu is True:
