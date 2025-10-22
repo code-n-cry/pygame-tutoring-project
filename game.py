@@ -1,8 +1,13 @@
 import pygame
 import random
+import sqlite3
 
 pygame.init()
-pygame.mixer.init()
+con = sqlite3.connect('records.db')
+cursor = con.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS records(id PRIMARY KEY,record INTEGER)''')
+con.commit()
+con.close()pygame.mixer.init()
 
 WIDTH, HEIGHT = 1000, 800
 clock = pygame.time.Clock()
@@ -72,7 +77,16 @@ class Player(pygame.sprite.Sprite):
 
 
 class Menu:
+
     def __init__(self):
+        con = sqlite3.connect('records.db')
+        cursor = con.cursor()
+        record_menu = cursor.execute('''SELECT record FROM records''').fetchall()
+        record = 0
+        if record_menu:
+            record = max(record_menu)
+        con.commit()
+        con.close()
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
         self.btn_text = font.render("Начать игру", True, (255, 255, 255))
         self.easy_btn = pygame.rect.Rect(300, 170, 230, 50)
@@ -86,6 +100,7 @@ class Menu:
             "Выбрать уровень сложности", True, (255, 255, 255)
         )
         self.menu_text = font.render("Меню", True, (255, 255, 255))
+        self.kill_text = font.render(f'ваш рекорд:{record}', True,(255,255,255))
         self.easy_pressed = False
         self.normal_pressed = False
         self.difficult_pressed = False
@@ -180,6 +195,7 @@ class Menu:
             screen.blit(self.menu_text, (370, 170))
             screen.blit(self.btn_text, (300, 270))
             screen.blit(self.difficult_btn_text, (300, 370))
+            screen.blit(self.kill_text,(300,450))
         else:
             if self.easy_pressed is False:
                 pygame.draw.rect(screen, (255, 0, 0), self.easy_btn)
@@ -210,14 +226,15 @@ class Enemy(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        self.image = pygame.image.load("images/wall.png")
+        self.image = pygame.transform.scale(self.image, (100, 35))
         self.rect = pygame.Rect(x, y, 100, 35)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (100, 10, 65), self.rect)
+        screen.blit(self.image, self.rect)
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -340,6 +357,11 @@ while True:
                     enemy_group.add(enemy)
                     if pygame.sprite.collide_rect(i, player):
                         player.alive = False
+                        con = sqlite3.connect('records.db')
+                        cursor = con.cursor()
+                        cursor.execute(''' INSERT INTO records(record) VALUES(?)''',(kill_count))
+                        cursor.commit()
+                        con.close()
                     if i.rect.x < 0:
                         i.kill()
     if not menu.in_menu:
