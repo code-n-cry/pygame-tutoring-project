@@ -2,6 +2,7 @@ import pygame
 import random
 
 pygame.init()
+pygame.mixer.init()
 
 WIDTH, HEIGHT = 1000, 800
 clock = pygame.time.Clock()
@@ -15,7 +16,6 @@ clock = pygame.time.Clock()
 
 font = pygame.font.SysFont("Bitcount Grid Double Ink", 50)
 font_big = pygame.font.SysFont("Bitcount Grid Double Ink", 150)
-
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
@@ -225,6 +225,7 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("images/bullet.png")
         self.image = pygame.transform.scale(self.image, (7, 7))
+        self.sound = pygame.mixer.Sound("sounds/shot.mp3")
         self.explosion_1 = pygame.image.load("images/explosion/1.png")
         self.explosion_1 = pygame.transform.scale(self.explosion_1, (50, 50))
         self.explosion_2 = pygame.image.load("images/explosion/2.png")
@@ -289,14 +290,19 @@ while True:
                             player.rect.y + 30,
                             12 * (player.speed_x / abs(player.speed_x)),
                         )
+                        bullet.sound.play()
                         player_bullet_group.add(bullet)
             if player.alive is False and event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
-                if 300 <= pos[0] <= 800 and 570 <= pos[1] <= 620 :
+                if 300 <= pos[0] <= 800 and 570 <= pos[1] <= 620:
                     die_pressed = True
                 else:
                     die_pressed = False
-            if event.type == pygame.MOUSEBUTTONDOWN and player.alive is False and die_pressed is True:
+            if (
+                event.type == pygame.MOUSEBUTTONDOWN
+                and player.alive is False
+                and die_pressed is True
+            ):
                 menu.in_menu = True
                 player.alive = True
                 for i in enemy_group:
@@ -304,13 +310,14 @@ while True:
                 for i in wall_group:
                     i.kill()
                 for i in enemy_bullet_group:
-                    i.kill()    
+                    i.kill()
             if event.type == TIME_EVENT:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    enemy_bullet_group.add(
-                        enemy_bullet_left, enemy_bullet_right)
+                    enemy_bullet_left.sound.play()
+                    enemy_bullet_right.sound.play()
+                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
                 while len(enemy_group) >= enemy_count:
                     for i in enemy_group:
