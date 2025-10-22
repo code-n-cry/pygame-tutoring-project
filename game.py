@@ -3,9 +3,11 @@ import random
 import sqlite3
 
 pygame.init()
-con = sqlite3.connect('records.db')
+con = sqlite3.connect("records.db")
 cursor = con.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS records(id PRIMARY KEY,record INTEGER)''')
+cursor.execute(
+    """CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY,record INTEGER)"""
+)
 con.commit()
 con.close()
 pygame.mixer.init()
@@ -81,12 +83,12 @@ class Player(pygame.sprite.Sprite):
 class Menu:
 
     def __init__(self):
-        con = sqlite3.connect('records.db')
+        con = sqlite3.connect("records.db")
         cursor = con.cursor()
-        record_menu = cursor.execute('''SELECT record FROM records''').fetchall()
+        record_menu = cursor.execute("""SELECT record FROM records""").fetchall()
         record = 0
         if record_menu:
-            record = max(record_menu)
+            record = max(record_menu)[0]
         con.commit()
         con.close()
         self.start_btn = pygame.rect.Rect(300, 270, 230, 50)
@@ -102,7 +104,7 @@ class Menu:
             "Выбрать уровень сложности", True, (255, 255, 255)
         )
         self.menu_text = font.render("Меню", True, (255, 255, 255))
-        self.kill_text = font.render(f'ваш рекорд:{record}', True,(255,255,255))
+        self.kill_text = font.render(f"ваш рекорд: {record}", True, (255, 255, 255))
         self.easy_pressed = False
         self.normal_pressed = False
         self.difficult_pressed = False
@@ -197,7 +199,7 @@ class Menu:
             screen.blit(self.menu_text, (370, 170))
             screen.blit(self.btn_text, (300, 270))
             screen.blit(self.difficult_btn_text, (300, 370))
-            screen.blit(self.kill_text,(300,450))
+            screen.blit(self.kill_text, (300, 450))
         else:
             if self.easy_pressed is False:
                 pygame.draw.rect(screen, (255, 0, 0), self.easy_btn)
@@ -229,6 +231,7 @@ class Enemy(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
+
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -246,6 +249,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.image.load("images/bullet.png")
         self.image = pygame.transform.scale(self.image, (7, 7))
         self.sound = pygame.mixer.Sound("sounds/shot.mp3")
+        self.sound.set_volume(0.2)
         self.explosion_1 = pygame.image.load("images/explosion/1.png")
         self.explosion_1 = pygame.transform.scale(self.explosion_1, (50, 50))
         self.explosion_2 = pygame.image.load("images/explosion/2.png")
@@ -323,8 +327,22 @@ while True:
                 and player.alive is False
                 and die_pressed is True
             ):
+                conn = sqlite3.connect("records.db")
+                cursor = conn.cursor()
+                record_menu = cursor.execute(
+                    """SELECT record FROM records"""
+                ).fetchall()
+                record = 0
+                if record_menu:
+                    record = max(record_menu)[0]
+                cursor.close()
+                con.close()
+                menu.kill_text = font.render(
+                    f"ваш рекорд: {record}", True, (255, 255, 255)
+                )
                 menu.in_menu = True
                 player.alive = True
+                kill_count = 0
                 for i in enemy_group:
                     i.kill()
                 for i in wall_group:
@@ -335,8 +353,9 @@ while True:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    enemy_bullet_left.sound.play()
-                    enemy_bullet_right.sound.play()
+                    if player.alive:
+                        enemy_bullet_left.sound.play()
+                        enemy_bullet_right.sound.play()
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
                 while len(enemy_group) >= enemy_count:
@@ -360,11 +379,6 @@ while True:
                     enemy_group.add(enemy)
                     if pygame.sprite.collide_rect(i, player):
                         player.alive = False
-                        con = sqlite3.connect('records.db')
-                        cursor = con.cursor()
-                        cursor.execute(''' INSERT INTO records(record) VALUES(?)''',(kill_count))
-                        cursor.commit()
-                        con.close()
                     if i.rect.x < 0:
                         i.kill()
     if not menu.in_menu:
@@ -382,9 +396,16 @@ while True:
             if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
                 i.harmful = False
-                if player.player_life <= 1:
+                if player.player_life == 1:
                     player.player_life -= 1
                     player.alive = False
+                    con = sqlite3.connect("records.db")
+                    cursor = con.cursor()
+                    cursor.execute(
+                        """ INSERT INTO records(record) VALUES(?)""", (kill_count,)
+                    )
+                    con.commit()
+                    con.close()
                     player.sound.play()
                 else:
                     player.player_life -= 1
