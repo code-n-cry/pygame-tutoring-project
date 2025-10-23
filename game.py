@@ -6,7 +6,8 @@ pygame.init()
 con = sqlite3.connect("records.db")
 cursor = con.cursor()
 cursor.execute(
-    """CREATE TABLE IF NOT EXISTS records(id INTEGER PRIMARY KEY,record INTEGER)"""
+    """CREATE TABLE IF NOT EXISTS records(id INTEGER
+    PRIMARY KEY,record INTEGER)"""
 )
 con.commit()
 con.close()
@@ -26,7 +27,7 @@ font = pygame.font.SysFont("Bitcount Grid Double Ink", 50)
 font_big = pygame.font.SysFont("Bitcount Grid Double Ink", 150)
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
-enemy_group ``= pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 heart_image = pygame.image.load("images/heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
@@ -36,12 +37,10 @@ difficult = "easy"
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.speed_x = 7
-        self.speed_y = 7
-        self.jumping = False
+        self.speed_x = 5
+        self.speed_y = 5
         self.player_life = 3
         self.alive = True
-        self.jump_timer = 12
         self.right = True
         self.image = pygame.image.load("images/player.png")
         self.sound = pygame.mixer.Sound("sounds/damage_enemy.mp3")
@@ -80,15 +79,12 @@ class Player(pygame.sprite.Sprite):
             screen.blit(self.image, self.rect)
 
 
-player = Player()
-
-
 class Menu:
-
     def __init__(self):
         con = sqlite3.connect("records.db")
         cursor = con.cursor()
-        record_menu = cursor.execute("""SELECT record FROM records""").fetchall()
+        record_menu = cursor.execute(
+            """SELECT record FROM records""").fetchall()
         record = 0
         if record_menu:
             record = max(record_menu)[0]
@@ -107,7 +103,8 @@ class Menu:
             "Выбрать уровень сложности", True, (255, 255, 255)
         )
         self.menu_text = font.render("Меню", True, (255, 255, 255))
-        self.kill_text = font.render(f"ваш рекорд: {record}", True, (255, 255, 255))
+        self.kill_text = font.render(
+            f"ваш рекорд: {record}", True, (255, 255, 255))
         self.easy_pressed = False
         self.normal_pressed = False
         self.difficult_pressed = False
@@ -123,7 +120,6 @@ class Menu:
             if not self.choice:
                 if 300 <= pos[0] <= 530 and 270 <= pos[1] <= 320:
                     self.in_menu = False
-                    coords = []
                     wall_count = 0
                     if difficult == "easy":
                         wall_count = 2
@@ -150,7 +146,6 @@ class Menu:
                                 wall = Wall(x, y)
                                 if pygame.sprite.collide_rect(wall, i):
                                     overlap = True
-                            coords.append([x, y])
                         wall_group.add(wall)
                 if 300 <= pos[0] <= 800 and 370 <= pos[1] <= 420:
                     self.choice = True
@@ -162,7 +157,6 @@ class Menu:
                 if 300 <= pos[0] <= 500 and 370 <= pos[1] <= 420:
                     difficult = "hard"
                 self.choice = False
-
         if event.type == pygame.MOUSEMOTION:
             pos = pygame.mouse.get_pos()
             if not self.choice:
@@ -219,7 +213,8 @@ class Menu:
             screen.blit(self.btn_easy_text, (370, 170))
             screen.blit(self.btn_normal_text, (300, 270))
             screen.blit(self.btn_hard_text, (300, 370))
-        
+
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -290,6 +285,7 @@ class Bullet(pygame.sprite.Sprite):
         pygame.draw.rect(screen, (30, 40, 56), self.rect)
         screen.blit(self.image, self.rect)
 
+
 class Game:
     def __init__(self):
         super().__init__()
@@ -304,7 +300,7 @@ class Game:
         self.enemy_die = False
 
     def update_events(self, event):
-        global player_bullet_group,enemy_group,wall_group,enemy_bullet_group
+        global player_bullet_group, enemy_group, wall_group, enemy_bullet_group
         if event.type == pygame.QUIT:
             pygame.quit()
         if self.menu.in_menu is True:
@@ -342,7 +338,6 @@ class Game:
                 cursor.close()
                 con.close()
                 self.menu.kill_text = font.render(
-                
                     f"ваш рекорд: {record}", True, (255, 255, 255)
                 )
                 self.menu.in_menu = True
@@ -361,7 +356,8 @@ class Game:
                     if player.alive:
                         enemy_bullet_left.sound.play()
                         enemy_bullet_right.sound.play()
-                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
+                    enemy_bullet_group.add(
+                        enemy_bullet_left, enemy_bullet_right)
             if event.type == SPAWN_EVENT:
                 while len(enemy_group) >= enemy_count:
                     for i in enemy_group:
@@ -386,15 +382,12 @@ class Game:
                         player.alive = False
                     if enemy.rect.x < 0:
                         enemy.kill()
-    
+
     def update(self):
         if not self.menu.in_menu:
             for i in enemy_group:
                 i.update()
         player.update()
-        text = f"Вы убили {self.kill_count} врагов"
-        rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font_big.render(self.text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -409,7 +402,8 @@ class Game:
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
-                        """ INSERT INTO records(record) VALUES(?)""", (self.kill_count,)
+                        """INSERT INTO records(record) VALUES(?)""", (
+                            self.kill_count,)
                     )
                     con.commit()
                     con.close()
@@ -428,15 +422,14 @@ class Game:
                     enemy.kill()
                     i.explosion = True
 
-    def draw(self,screen):
-        global wall_group,enemy_bullet_group,player_bullet_group,enemy_group
+    def draw(self, screen):
+        global wall_group, enemy_bullet_group, player_bullet_group, enemy_group
         if not self.menu.in_menu:
             for i in enemy_group:
                 i.update()
         player.update()
         text = f"Вы убили {self.kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font_big.render(self.text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -451,7 +444,8 @@ class Game:
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
-                        """ INSERT INTO records(record) VALUES(?)""", (self.kill_count,)
+                        """INSERT INTO records(record) VALUES(?)""", (
+                            self.kill_count,)
                     )
                     con.commit()
                     con.close()
@@ -469,31 +463,6 @@ class Game:
                     enemy.sound.play()
                     enemy.kill()
                     i.explosion = True
-<<<<<<< HEAD
-   if self.menu.in_menu is True:
-        self.menu.draw(screen)
-    else:
-        screen.fill((0, 0, 0))
-        for i in range(self.player.player_life):
-            screen.blit(heart_image, (i * 50, 0))
-        for i in enemy_group:
-            i.draw(screen)
-        for i in enemy_bullet_group:
-            i.draw(screen)
-        for i in player_bullet_group:
-            i.draw(screen)
-        for i in wall_group:
-            i.draw(screen)
-        self.player.draw(screen)
-        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if self.player.alive is False:
-            if self.die_pressed is False:
-                pygame.draw.rect(screen, (255, 0, 0), self.die_btn)
-            else:
-                pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
-            screen.blit(self.btn_die_text, (400, 570))
-            screen.blit(self.rendered_2, (250, 400))
-=======
         if self.menu.in_menu is True:
             self.menu.draw(screen)
         else:
@@ -508,17 +477,18 @@ class Game:
                 i.draw(screen)
             for i in wall_group:
                 i.draw(screen)
-            self.player.draw(screen)
+            player.draw(screen)
             screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-            if self.player.alive is False:
+            if player.alive is False:
                 if self.die_pressed is False:
                     pygame.draw.rect(screen, (255, 0, 0), self.die_btn)
                 else:
                     pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
                 screen.blit(self.btn_die_text, (400, 570))
                 screen.blit(self.rendered_2, (250, 400))
->>>>>>> b5969e12fe64b83737f8ff067dd8bc9e09d2d8f8
 
+
+player = Player()
 game = Game()
 
 while True:
