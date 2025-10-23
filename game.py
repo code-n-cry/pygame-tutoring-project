@@ -26,7 +26,7 @@ font = pygame.font.SysFont("Bitcount Grid Double Ink", 50)
 font_big = pygame.font.SysFont("Bitcount Grid Double Ink", 150)
 enemy_bullet_group = pygame.sprite.Group()
 player_bullet_group = pygame.sprite.Group()
-enemy_group = pygame.sprite.Group()
+enemy_group ``= pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 heart_image = pygame.image.load("images/heart.png")
 heart_image = pygame.transform.scale(heart_image, (30, 30))
@@ -424,8 +424,8 @@ class Game:
                     i.explosion = True
     def draw(self,screen):
         if not menu.in_menu:
-        for i in enemy_group:
-            i.update()
+            for i in enemy_group:
+                i.update()
         player.update()
         text = f"Вы убили {kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
