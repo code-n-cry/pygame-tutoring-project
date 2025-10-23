@@ -290,29 +290,30 @@ class Bullet(pygame.sprite.Sprite):
 class Game:
     def __init__(self):
         super().__init__()
-        kill_count = 0
-        enemy_count = 1
-        player = Player()
-        menu = Menu()
-        text_player = "вы погибли"
-        btn_die_text = font.render("Перейти меню", True, (255, 255, 255))
-        die_btn = pygame.rect.Rect(300, 570, 500, 50)
-        die_pressed = False
-        enemy_die = False
+        self.kill_count = 0
+        self.enemy_count = 1
+        self.player = Player()
+        self.menu = Menu()
+        self.text_player = "вы погибли"
+        self.btn_die_text = font.render("Перейти меню", True, (255, 255, 255))
+        self.die_btn = pygame.rect.Rect(300, 570, 500, 50)
+        self.die_pressed = False
+        self.enemy_die = False
 
     def update_events(self, event):
+        global player_bullet_group,enemy_group,wall_group,enemy_bullet_group
         if event.type == pygame.QUIT:
             pygame.quit()
-        if menu.in_menu is True:
-            menu.update(event)
+        if self.menu.in_menu is True:
+            self.menu.update(event)
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if player.alive:
+                    if self.player.alive:
                         bullet = Bullet(
                             player.rect.x,
                             player.rect.y + 30,
-                            12 * (player.speed_x / abs(player.speed_x)),
+                            12 * (self.player.speed_x / abs(self.player.speed_x)),
                         )
                         bullet.sound.play()
                         player_bullet_group.add(bullet)
@@ -337,12 +338,13 @@ class Game:
                     record = max(record_menu)[0]
                 cursor.close()
                 con.close()
-                menu.kill_text = font.render(
+                self.menu.kill_text = font.render(
+                
                     f"ваш рекорд: {record}", True, (255, 255, 255)
                 )
-                menu.in_menu = True
+                self.menu.in_menu = True
                 player.alive = True
-                kill_count = 0
+                self.kill_count = 0
                 for i in enemy_group:
                     i.kill()
                 for i in wall_group:
@@ -353,7 +355,7 @@ class Game:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    if player.alive:
+                    if self.player.alive:
                         enemy_bullet_left.sound.play()
                         enemy_bullet_right.sound.play()
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
@@ -383,13 +385,13 @@ class Game:
                         i.kill()
     
     def update(self):
-        if not menu.in_menu:
-        for i in enemy_group:
-            i.update()
+        if not self.menu.in_menu:
+            for i in enemy_group:
+                i.update()
         player.update()
-        text = f"Вы убили {kill_count} врагов"
+        text = f"Вы убили {self.kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font_big.render(text_player, True, (255, 0, 0))
+        rendered_2 = font_big.render(self.text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -398,19 +400,19 @@ class Game:
             if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
                 i.harmful = False
-                if player.player_life == 1:
-                    player.player_life -= 1
-                    player.alive = False
+                if self.player.player_life == 1:
+                    self.player.player_life -= 1
+                    self.player.alive = False
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
-                        """ INSERT INTO records(record) VALUES(?)""", (kill_count,)
+                        """ INSERT INTO records(record) VALUES(?)""", (self.kill_count,)
                     )
                     con.commit()
                     con.close()
-                    player.sound.play()
+                    self.player.sound.play()
                 else:
-                    player.player_life -= 1
+                    self.player.player_life -= 1
         for i in player_bullet_group:
             i.update()
             for n in wall_group:
@@ -418,18 +420,20 @@ class Game:
                     i.explosion = True
             for enemy in enemy_group:
                 if pygame.sprite.collide_rect(enemy, i) and i.harmful:
-                    kill_count += 1
+                    self.kill_count += 1
                     enemy.sound.play()
                     enemy.kill()
                     i.explosion = True
+
     def draw(self,screen):
-        if not menu.in_menu:
-        for i in enemy_group:
-            i.update()
+        global wall_group,enemy_bullet_group,player_bullet_group,enemy_group
+        if not self.menu.in_menu:
+            for i in enemy_group:
+                i.update()
         player.update()
-        text = f"Вы убили {kill_count} врагов"
+        text = f"Вы убили {self.kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font_big.render(text_player, True, (255, 0, 0))
+        rendered_2 = font_big.render(self.text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -438,35 +442,35 @@ class Game:
             if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
                 i.harmful = False
-                if player.player_life == 1:
-                    player.player_life -= 1
-                    player.alive = False
+                if self.player.player_life == 1:
+                    self.player.player_life -= 1
+                    self.player.alive = False
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
-                        """ INSERT INTO records(record) VALUES(?)""", (kill_count,)
+                        """ INSERT INTO records(record) VALUES(?)""", (self.kill_count,)
                     )
                     con.commit()
                     con.close()
                     player.sound.play()
                 else:
                     player.player_life -= 1
-        for i in player_bullet_group:
+        for i in self.player_bullet_group:
             i.update()
-            for n in wall_group:
+            for n in self.wall_group:
                 if pygame.sprite.collide_rect(i, n):
                     i.explosion = True
-            for enemy in enemy_group:
+            for enemy in self.enemy_group:
                 if pygame.sprite.collide_rect(enemy, i) and i.harmful:
-                    kill_count += 1
-                    enemy.sound.play()
-                    enemy.kill()
+                    self.kill_count += 1
+                    self.enemy.sound.play()
+                    self.enemy.kill()
                     i.explosion = True
-    if menu.in_menu is True:
-        menu.draw(screen)
+    if self.menu.in_menu is True:
+        self.menu.draw(screen)
     else:
         screen.fill((0, 0, 0))
-        for i in range(player.player_life):
+        for i in range(self.player.player_life):
             screen.blit(heart_image, (i * 50, 0))
         for i in enemy_group:
             i.draw(screen)
@@ -476,160 +480,23 @@ class Game:
             i.draw(screen)
         for i in wall_group:
             i.draw(screen)
-        player.draw(screen)
+        self.player.draw(screen)
         screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if player.alive is False:
-            if die_pressed is False:
-                pygame.draw.rect(screen, (255, 0, 0), die_btn)
+        if self.player.alive is False:
+            if self.die_pressed is False:
+                pygame.draw.rect(screen, (255, 0, 0), self.die_btn)
             else:
-                pygame.draw.rect(screen, (0, 0, 255), die_btn)
-            screen.blit(btn_die_text, (400, 570))
-            screen.blit(rendered_2, (250, 400))
+                pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
+            screen.blit(self.btn_die_text, (400, 570))
+            screen.blit(self.rendered_2, (250, 400))
+
+game = Game()
 
 while True:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-        if menu.in_menu is True:
-            menu.update(event)
-        else:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    if player.alive:
-                        bullet = Bullet(
-                            player.rect.x,
-                            player.rect.y + 30,
-                            12 * (player.speed_x / abs(player.speed_x)),
-                        )
-                        bullet.sound.play()
-                        player_bullet_group.add(bullet)
-            if player.alive is False and event.type == pygame.MOUSEMOTION:
-                pos = pygame.mouse.get_pos()
-                if 300 <= pos[0] <= 800 and 570 <= pos[1] <= 620:
-                    die_pressed = True
-                else:
-                    die_pressed = False
-            if (
-                event.type == pygame.MOUSEBUTTONDOWN
-                and player.alive is False
-                and die_pressed is True
-            ):
-                conn = sqlite3.connect("records.db")
-                cursor = conn.cursor()
-                record_menu = cursor.execute(
-                    """SELECT record FROM records"""
-                ).fetchall()
-                record = 0
-                if record_menu:
-                    record = max(record_menu)[0]
-                cursor.close()
-                con.close()
-                menu.kill_text = font.render(
-                    f"ваш рекорд: {record}", True, (255, 255, 255)
-                )
-                menu.in_menu = True
-                player.alive = True
-                kill_count = 0
-                for i in enemy_group:
-                    i.kill()
-                for i in wall_group:
-                    i.kill()
-                for i in enemy_bullet_group:
-                    i.kill()
-            if event.type == TIME_EVENT:
-                for i in enemy_group:
-                    enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
-                    enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    if player.alive:
-                        enemy_bullet_left.sound.play()
-                        enemy_bullet_right.sound.play()
-                    enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
-            if event.type == SPAWN_EVENT:
-                while len(enemy_group) >= enemy_count:
-                    for i in enemy_group:
-                        i.kill()
-                for c in range(enemy_count):
-                    x = random.randint(51, 940)
-                    y = random.randint(51, 720)
-                    enemy = Enemy(x, y)
-                    overlap = True
-                    while overlap is True:
-                        for j in wall_group:
-                            overlap = False
-                            x = random.randint(51, 940)
-                            y = random.randint(51, 720)
-                            enemy = Enemy(x, y)
-                            if pygame.sprite.collide_rect(
-                                i, enemy
-                            ) or pygame.sprite.collide_rect(j, enemy):
-                                overlap = True
-                    enemy_group.add(enemy)
-                    if pygame.sprite.collide_rect(i, player):
-                        player.alive = False
-                    if i.rect.x < 0:
-                        i.kill()
-    if not menu.in_menu:
-        for i in enemy_group:
-            i.update()
-        player.update()
-        text = f"Вы убили {kill_count} врагов"
-        rendered = font.render(text, True, (255, 0, 0))
-        rendered_2 = font_big.render(text_player, True, (255, 0, 0))
-        for i in enemy_bullet_group:
-            i.update()
-            for g in wall_group:
-                if pygame.sprite.collide_rect(i, g):
-                    i.explosion = True
-            if pygame.sprite.collide_rect(player, i) and i.harmful:
-                i.explosion = True
-                i.harmful = False
-                if player.player_life == 1:
-                    player.player_life -= 1
-                    player.alive = False
-                    con = sqlite3.connect("records.db")
-                    cursor = con.cursor()
-                    cursor.execute(
-                        """ INSERT INTO records(record) VALUES(?)""", (kill_count,)
-                    )
-                    con.commit()
-                    con.close()
-                    player.sound.play()
-                else:
-                    player.player_life -= 1
-        for i in player_bullet_group:
-            i.update()
-            for n in wall_group:
-                if pygame.sprite.collide_rect(i, n):
-                    i.explosion = True
-            for enemy in enemy_group:
-                if pygame.sprite.collide_rect(enemy, i) and i.harmful:
-                    kill_count += 1
-                    enemy.sound.play()
-                    enemy.kill()
-                    i.explosion = True
-    if menu.in_menu is True:
-        menu.draw(screen)
-    else:
-        screen.fill((0, 0, 0))
-        for i in range(player.player_life):
-            screen.blit(heart_image, (i * 50, 0))
-        for i in enemy_group:
-            i.draw(screen)
-        for i in enemy_bullet_group:
-            i.draw(screen)
-        for i in player_bullet_group:
-            i.draw(screen)
-        for i in wall_group:
-            i.draw(screen)
-        player.draw(screen)
-        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if player.alive is False:
-            if die_pressed is False:
-                pygame.draw.rect(screen, (255, 0, 0), die_btn)
-            else:
-                pygame.draw.rect(screen, (0, 0, 255), die_btn)
-            screen.blit(btn_die_text, (400, 570))
-            screen.blit(rendered_2, (250, 400))
+        game.update_events(event)
+    game.update()
+    game.draw(screen)
 
     clock.tick(60)
     pygame.display.flip()
