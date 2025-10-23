@@ -466,7 +466,7 @@ class Game:
                     self.enemy.sound.play()
                     self.enemy.kill()
                     i.explosion = True
-    if self.menu.in_menu is True:
+   if self.menu.in_menu is True:
         self.menu.draw(screen)
     else:
         screen.fill((0, 0, 0))
