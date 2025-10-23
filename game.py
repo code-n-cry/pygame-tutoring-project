@@ -80,6 +80,9 @@ class Player(pygame.sprite.Sprite):
             screen.blit(self.image, self.rect)
 
 
+player = Player()
+
+
 class Menu:
 
     def __init__(self):
@@ -313,7 +316,7 @@ class Game:
                         bullet = Bullet(
                             player.rect.x,
                             player.rect.y + 30,
-                            12 * (self.player.speed_x / abs(self.player.speed_x)),
+                            12 * (player.speed_x / abs(player.speed_x)),
                         )
                         bullet.sound.play()
                         player_bullet_group.add(bullet)
@@ -355,7 +358,7 @@ class Game:
                 for i in enemy_group:
                     enemy_bullet_left = Bullet(i.rect.x, i.rect.y + 30, 12)
                     enemy_bullet_right = Bullet(i.rect.x, i.rect.y + 30, -12)
-                    if self.player.alive:
+                    if player.alive:
                         enemy_bullet_left.sound.play()
                         enemy_bullet_right.sound.play()
                     enemy_bullet_group.add(enemy_bullet_left, enemy_bullet_right)
@@ -375,14 +378,14 @@ class Game:
                             y = random.randint(51, 720)
                             enemy = Enemy(x, y)
                             if pygame.sprite.collide_rect(
-                                i, enemy
+                                j, enemy
                             ) or pygame.sprite.collide_rect(j, enemy):
                                 overlap = True
                     enemy_group.add(enemy)
-                    if pygame.sprite.collide_rect(i, player):
+                    if pygame.sprite.collide_rect(enemy, player):
                         player.alive = False
-                    if i.rect.x < 0:
-                        i.kill()
+                    if enemy.rect.x < 0:
+                        enemy.kill()
     
     def update(self):
         if not self.menu.in_menu:
@@ -400,9 +403,9 @@ class Game:
             if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
                 i.harmful = False
-                if self.player.player_life == 1:
-                    self.player.player_life -= 1
-                    self.player.alive = False
+                if player.player_life == 1:
+                    player.player_life -= 1
+                    player.alive = False
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
@@ -412,7 +415,7 @@ class Game:
                     con.close()
                     self.player.sound.play()
                 else:
-                    self.player.player_life -= 1
+                    player.player_life -= 1
         for i in player_bullet_group:
             i.update()
             for n in wall_group:
@@ -442,9 +445,9 @@ class Game:
             if pygame.sprite.collide_rect(player, i) and i.harmful:
                 i.explosion = True
                 i.harmful = False
-                if self.player.player_life == 1:
-                    self.player.player_life -= 1
-                    self.player.alive = False
+                if player.player_life == 1:
+                    player.player_life -= 1
+                    player.alive = False
                     con = sqlite3.connect("records.db")
                     cursor = con.cursor()
                     cursor.execute(
@@ -455,40 +458,40 @@ class Game:
                     player.sound.play()
                 else:
                     player.player_life -= 1
-        for i in self.player_bullet_group:
+        for i in player_bullet_group:
             i.update()
-            for n in self.wall_group:
+            for n in wall_group:
                 if pygame.sprite.collide_rect(i, n):
                     i.explosion = True
-            for enemy in self.enemy_group:
+            for enemy in enemy_group:
                 if pygame.sprite.collide_rect(enemy, i) and i.harmful:
                     self.kill_count += 1
-                    self.enemy.sound.play()
-                    self.enemy.kill()
+                    enemy.sound.play()
+                    enemy.kill()
                     i.explosion = True
-    if self.menu.in_menu is True:
-        self.menu.draw(screen)
-    else:
-        screen.fill((0, 0, 0))
-        for i in range(self.player.player_life):
-            screen.blit(heart_image, (i * 50, 0))
-        for i in enemy_group:
-            i.draw(screen)
-        for i in enemy_bullet_group:
-            i.draw(screen)
-        for i in player_bullet_group:
-            i.draw(screen)
-        for i in wall_group:
-            i.draw(screen)
-        self.player.draw(screen)
-        screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
-        if self.player.alive is False:
-            if self.die_pressed is False:
-                pygame.draw.rect(screen, (255, 0, 0), self.die_btn)
-            else:
-                pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
-            screen.blit(self.btn_die_text, (400, 570))
-            screen.blit(self.rendered_2, (250, 400))
+        if self.menu.in_menu is True:
+            self.menu.draw(screen)
+        else:
+            screen.fill((0, 0, 0))
+            for i in range(player.player_life):
+                screen.blit(heart_image, (i * 50, 0))
+            for i in enemy_group:
+                i.draw(screen)
+            for i in enemy_bullet_group:
+                i.draw(screen)
+            for i in player_bullet_group:
+                i.draw(screen)
+            for i in wall_group:
+                i.draw(screen)
+            self.player.draw(screen)
+            screen.blit(rendered, (WIDTH - rendered.get_width(), 0))
+            if self.player.alive is False:
+                if self.die_pressed is False:
+                    pygame.draw.rect(screen, (255, 0, 0), self.die_btn)
+                else:
+                    pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
+                screen.blit(self.btn_die_text, (400, 570))
+                screen.blit(self.rendered_2, (250, 400))
 
 game = Game()
 
