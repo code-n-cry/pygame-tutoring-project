@@ -16,6 +16,8 @@ pygame.mixer.init()
 WIDTH, HEIGHT = 1000, 800
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Наша игра')
+pygame.display.set_icon(pygame.image.load('images/icon.jpg'))
 pygame.init()
 SPAWN_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(SPAWN_EVENT, 3000)
@@ -73,6 +75,9 @@ class Player(pygame.sprite.Sprite):
                 if pygame.sprite.collide_rect(self, wall):
                     self.rect.x = old_x
                     self.rect.y = old_y
+        else:
+            self.rect.x = 0
+            self.rect.y = 0
 
     def draw(self, screen):
         if self.alive is True:
@@ -319,13 +324,13 @@ class Game:
             if player.alive is False and event.type == pygame.MOUSEMOTION:
                 pos = pygame.mouse.get_pos()
                 if 300 <= pos[0] <= 800 and 570 <= pos[1] <= 620:
-                    die_pressed = True
+                    self.die_pressed = True
                 else:
-                    die_pressed = False
+                    self.die_pressed = False
             if (
                 event.type == pygame.MOUSEBUTTONDOWN
                 and player.alive is False
-                and die_pressed is True
+                and self.die_pressed is True
             ):
                 conn = sqlite3.connect("records.db")
                 cursor = conn.cursor()
@@ -430,6 +435,7 @@ class Game:
         player.update()
         text = f"Вы убили {self.kill_count} врагов"
         rendered = font.render(text, True, (255, 0, 0))
+        rendered_2 = font_big.render(self.text_player, True, (255, 0, 0))
         for i in enemy_bullet_group:
             i.update()
             for g in wall_group:
@@ -485,7 +491,7 @@ class Game:
                 else:
                     pygame.draw.rect(screen, (0, 0, 255), self.die_btn)
                 screen.blit(self.btn_die_text, (400, 570))
-                screen.blit(self.rendered_2, (250, 400))
+                screen.blit(rendered_2, (250, 400))
 
 
 player = Player()
